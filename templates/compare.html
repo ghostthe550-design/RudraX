@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RudraX — Compare Lenders &amp; Concessional Schemes</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    .filter-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 22px;
+      background: #FFFFFF;
+      padding: 16px 20px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--iron-200);
+      box-shadow: var(--shadow-sm);
+    }
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .filter-group label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--iron-700);
+      white-space: nowrap;
+    }
+    .filter-group select {
+      padding: 8px 12px;
+      font-size: 0.88rem;
+      width: auto;
+    }
+    .type-pill {
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 12px;
+      white-space: nowrap;
+    }
+    .type-govt { background: #EBF8FF; color: #2B6CB0; }
+    .type-bank { background: #E6FFFA; color: #234E52; }
+    .type-rrb { background: #FEFCBF; color: #744210; }
+    .type-nbfc { background: #FAF5FF; color: #553C9A; }
+    .type-block { background: #FEEBC8; color: #7B341E; }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand-row">
+      <div class="brand-identity">
+        <div class="brand-shield">RX</div>
+        <div class="brand-text">
+          <h1>RudraX</h1>
+          <p>Concessional Finance Navigator &amp; Eligibility Shield</p>
+        </div>
+      </div>
+    </div>
+    <nav class="site-nav">
+      <a href="{{ url_for('index') }}" class="nav-link">1. Scheme Matcher</a>
+      <a href="{{ url_for('compare') }}" class="nav-link active">2. Compare Lenders</a>
+      <a href="{{ url_for('navigator') }}" class="nav-link">3. EMI Calculator &amp; Partner Map</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <div class="page-title-section">
+    <h2>Multi-Channel Lender &amp; Scheme Comparison</h2>
+    <p>Compare borrowing options across 3 distinct routes: Central Concessional Schemes, Disbursing Partner Banks &amp; NBFCs, and Block-Level Direct Schemes. Review interest rates, disbursal turnaround times, and moratorium windows.</p>
+  </div>
+
+  <div class="filter-bar">
+    <div class="filter-group">
+      <label for="sort-select">Sort By:</label>
+      <select id="sort-select" onchange="applyFilters()">
+        <option value="rate_asc">Lowest Interest Rate (Default)</option>
+        <option value="safety_speed">Fastest Disbursal &amp; Lowest NPA Risk</option>
+        <option value="amount_desc">Highest Max Loan Amount</option>
+        <option value="moratorium_desc">Longest Moratorium Grace</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="type-filter">Channel Route:</label>
+      <select id="type-filter" onchange="applyFilters()">
+        <option value="all">All Lending Channels (7)</option>
+        <option value="Govt Scheme">Government Concessional</option>
+        <option value="PSB">Public Sector Bank (PSB)</option>
+        <option value="RRB">Regional Rural Bank (RRB)</option>
+        <option value="NBFC-MFI">NBFC-MFI Microfinance</option>
+        <option value="Block Scheme">Block-Level Direct Desk</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Lender / Scheme</th>
+          <th>Channel Type</th>
+          <th>Interest Rate</th>
+          <th>Max Loan</th>
+          <th>Moratorium</th>
+          <th>Avg. Disbursal</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="lenders-tbody"></tbody>
+    </table>
+  </div>
+
+  <div style="margin-top: 30px; display: flex; gap: 14px; flex-wrap: wrap;">
+    <a href="{{ url_for('index') }}" class="btn-primary">Check Exact Eligibility Match &rarr;</a>
+    <a href="{{ url_for('navigator') }}" class="btn-secondary">Open Interactive EMI Simulator</a>
+  </div>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <p>All loan figures, processing timelines, and interest rates are benchmarked against official circulars and RBI priority sector lending norms.</p>
+    <p class="attribution">Developed for <strong>Smart India Hackathon (SIH)</strong> &middot; Team <strong>RudraX</strong></p>
+  </div>
+</footer>
+
+<script>
+/* ===============================================================
+   LENDER SEED DATA (Concessional, Commercial, & Block Channels)
+   =============================================================== */
+const LENDERS = [
+  {
+    name: 'NSFDC Micro Finance Facility',
+    type: 'Govt Scheme',
+    interest_rate: 6.0,
+    max_loan: 140000,
+    moratorium_months: 3,
+    processing_days: 14,
+    fund_availability: 88,
+    npa_ratio: 0.04,
+    scheme_id: 'MFS04'
+  },
+  {
+    name: 'Mahila Micro Credit (Women <=35)',
+    type: 'Govt Scheme',
+    interest_rate: 4.0,
+    max_loan: 140000,
+    moratorium_months: 3,
+    processing_days: 10,
+    fund_availability: 92,
+    npa_ratio: 0.03,
+    scheme_id: 'MMCS07'
+  },
+  {
+    name: 'PM MUDRA Yojana (Tarun Category)',
+    type: 'Govt Scheme',
+    interest_rate: 8.5,
+    max_loan: 1000000,
+    moratorium_months: 3,
+    processing_days: 12,
+    fund_availability: 80,
+    npa_ratio: 0.07,
+    scheme_id: 'PMMY01'
+  },
+  {
+    name: 'Canara Bank Priority Sector MSME',
+    type: 'PSB',
+    interest_rate: 9.8,
+    max_loan: 2500000,
+    moratorium_months: 6,
+    processing_days: 18,
+    fund_availability: 75,
+    npa_ratio: 0.06,
+    scheme_id: 'PMMY01'
+  },
+  {
+    name: 'Uttar Bihar Gramin Bank (RRB Cell)',
+    type: 'RRB',
+    interest_rate: 8.9,
+    max_loan: 1500000,
+    moratorium_months: 6,
+    processing_days: 11,
+    fund_availability: 94,
+    npa_ratio: 0.03,
+    scheme_id: 'TLS05'
+  },
+  {
+    name: 'Satin Creditcare Rural Micro-Loan',
+    type: 'NBFC-MFI',
+    interest_rate: 14.5,
+    max_loan: 100000,
+    moratorium_months: 1,
+    processing_days: 3,
+    fund_availability: 65,
+    npa_ratio: 0.09,
+    scheme_id: 'MFS04'
+  },
+  {
+    name: 'District Welfare / Block Micro Desk',
+    type: 'Block Scheme',
+    interest_rate: 4.5,
+    max_loan: 50000,
+    moratorium_months: 3,
+    processing_days: 7,
+    fund_availability: 96,
+    npa_ratio: 0.02,
+    scheme_id: 'MFS04'
+  }
+];
+
+function getTypeClass(type) {
+  switch (type) {
+    case 'Govt Scheme': return 'type-govt';
+    case 'PSB': return 'type-bank';
+    case 'RRB': return 'type-rrb';
+    case 'NBFC-MFI': return 'type-nbfc';
+    case 'Block Scheme': return 'type-block';
+    default: return 'type-govt';
+  }
+}
+
+function computeSafetySpeedScore(l) {
+  // Score = 0.6 * (1 - npa) + 0.4 * (1 / (1 + processing_days/10))
+  return (0.6 * (1 - l.npa_ratio)) + (0.4 * (1 / (1 + l.processing_days / 10)));
+}
+
+function applyFilters() {
+  const sortMode = document.getElementById('sort-select').value;
+  const typeFilter = document.getElementById('type-filter').value;
+
+  let filtered = LENDERS.filter(l => {
+    if (typeFilter !== 'all' && l.type !== typeFilter) return false;
+    return true;
+  });
+
+  if (sortMode === 'rate_asc') {
+    filtered.sort((a, b) => a.interest_rate - b.interest_rate);
+  } else if (sortMode === 'safety_speed') {
+    filtered.sort((a, b) => computeSafetySpeedScore(b) - computeSafetySpeedScore(a));
+  } else if (sortMode === 'amount_desc') {
+    filtered.sort((a, b) => b.max_loan - a.max_loan);
+  } else if (sortMode === 'moratorium_desc') {
+    filtered.sort((a, b) => b.moratorium_months - a.moratorium_months);
+  }
+
+  // Identify Best Rate and Fastest & Safest
+  const minRate = Math.min(...LENDERS.map(l => l.interest_rate));
+  let maxScore = -1, safestLender = null;
+  LENDERS.forEach(l => {
+    const s = computeSafetySpeedScore(l);
+    if (s > maxScore) { maxScore = s; safestLender = l.name; }
+  });
+
+  const tbody = document.getElementById('lenders-tbody');
+  tbody.innerHTML = filtered.map(l => {
+    const isBestRate = l.interest_rate === minRate;
+    const isFastestSafest = l.name === safestLender;
+
+    let badges = '';
+    if (isBestRate) badges += '<span class="lender-badge badge-best-rate">Best Rate</span>';
+    if (isFastestSafest) badges += '<span class="lender-badge badge-fastest">Fastest &amp; Safest</span>';
+
+    return `
+      <tr>
+        <td>
+          <div style="font-weight: 700; color: var(--iron-900);">
+            ${l.name} ${badges}
+          </div>
+          <span style="font-size: 0.78rem; color: var(--iron-500);">Fund Liquidity: ${l.fund_availability}% &middot; NPA: ${(l.npa_ratio * 100).toFixed(1)}%</span>
+        </td>
+        <td><span class="type-pill ${getTypeClass(l.type)}">${l.type}</span></td>
+        <td><strong style="color: var(--ember-600); font-size: 1rem;">${l.interest_rate}% p.a.</strong></td>
+        <td>₹${l.max_loan.toLocaleString('en-IN')}</td>
+        <td>${l.moratorium_months} Months</td>
+        <td>${l.processing_days} Business Days</td>
+        <td>
+          <a href="/navigator?scheme=${l.scheme_id}&amount=${l.max_loan}" class="btn-outline btn-sm" style="white-space: nowrap;">
+            Simulate EMI &rarr;
+          </a>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+window.addEventListener('DOMContentLoaded', applyFilters);
+</script>
+
+</body>
+</html>

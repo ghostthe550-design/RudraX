@@ -1,0 +1,283 @@
+{
+  "schemes": [
+    {
+      "scheme_id": "PMMY01",
+      "scheme_name": "PM MUDRA Yojana (Shishu/Kishor/Tarun)",
+      "issuing_authority": "Ministry of Finance, MUDRA Ltd.",
+      "loan_category": "Micro/Small Business Loan",
+      "max_loan_amount": 1000000,
+      "min_loan_amount": 50000,
+      "interest_rate": 8.5,
+      "interest_rate_range": "8.0% - 12.0% (bank dependent)",
+      "moratorium_months": 3,
+      "funding_pct": 90,
+      "purpose": "micro",
+      "eligibility_rules": {
+        "min_age": 18,
+        "max_age": 99,
+        "allowed_genders": ["Male", "Female", "Other"],
+        "allowed_castes": ["General", "SC", "ST", "OBC"],
+        "min_education_level": 0,
+        "allow_defaulters": false,
+        "pwd_eligible": true,
+        "special_conditions": [
+          "Must be a non-farm income generating micro/small enterprise",
+          "Trading, manufacturing, or service sector activity"
+        ]
+      },
+      "contact_and_apply": {
+        "portal_url": "udyamimitra.in",
+        "toll_free_helpline": "1800-180-1111",
+        "support_email": "support@mudra.org.in",
+        "designated_physical_office": "Any Scheduled Commercial Bank / RRB / NBFC-MFI branch"
+      },
+      "application_steps": [
+        "Step 1: Prepare Aadhaar, PAN, business plan, and address proof documents",
+        "Step 2: Register and fill the application on udyamimitra.in or visit the nearest branch",
+        "Step 3: Select the loan category (Shishu <= 50k / Kishor <= 5L / Tarun <= 10L) based on requirement",
+        "Step 4: Submit the application for verification by the bank/NBFC-MFI officer",
+        "Step 5: On approval, receive a MUDRA Card and the sanctioned loan amount in your account"
+      ]
+    },
+    {
+      "scheme_id": "SUI02",
+      "scheme_name": "Stand-Up India Scheme",
+      "issuing_authority": "Department of Financial Services, Ministry of Finance",
+      "loan_category": "Greenfield Enterprise Loan",
+      "max_loan_amount": 10000000,
+      "min_loan_amount": 1000000,
+      "interest_rate": 9.5,
+      "interest_rate_range": "Base Rate + 3% + Tenor Premium (~9.5%)",
+      "moratorium_months": 6,
+      "funding_pct": 85,
+      "purpose": "term",
+      "eligibility_rules": {
+        "min_age": 18,
+        "max_age": 99,
+        "allowed_genders": ["Male", "Female", "Other"],
+        "allowed_castes": ["General", "SC", "ST", "OBC"],
+        "min_education_level": 0,
+        "allow_defaulters": false,
+        "pwd_eligible": true,
+        "special_conditions": [
+          "Applicant must be either SC/ST category OR Female (at least one condition required)",
+          "Must be setting up a new (greenfield) enterprise — trading, manufacturing, or services",
+          "Applicant should not be in default to any bank/financial institution"
+        ]
+      },
+      "contact_and_apply": {
+        "portal_url": "standupmitra.in",
+        "toll_free_helpline": "1800-180-1111",
+        "support_email": "contact@standupmitra.in",
+        "designated_physical_office": "Lead District Bank Manager (LDM) office / Nearest Scheduled Commercial Bank branch"
+      },
+      "application_steps": [
+        "Step 1: Register on standupmitra.in with basic profile and business idea details",
+        "Step 2: Complete the online 'Ready to Apply' checklist and handholding session if needed",
+        "Step 3: Submit the loan application along with the generated system-tracked application number to the chosen bank branch",
+        "Step 4: Bank conducts due diligence, project appraisal, and collateral/guarantee assessment",
+        "Step 5: On sanction, loan is disbursed along with a RuPay Debit Card for working capital drawdown"
+      ]
+    },
+    {
+      "scheme_id": "PMEGP03",
+      "scheme_name": "Prime Minister's Employment Generation Programme (PMEGP)",
+      "issuing_authority": "Khadi and Village Industries Commission (KVIC), Ministry of MSME",
+      "loan_category": "Subsidy-Linked Business Loan",
+      "max_loan_amount": 5000000,
+      "min_loan_amount": 100000,
+      "interest_rate": 10.5,
+      "interest_rate_range": "Bank rate (with 25%–35% capital subsidy)",
+      "moratorium_months": 6,
+      "funding_pct": 90,
+      "purpose": "term",
+      "eligibility_rules": {
+        "min_age": 18,
+        "max_age": 99,
+        "allowed_genders": ["Male", "Female", "Other"],
+        "allowed_castes": ["General", "SC", "ST", "OBC"],
+        "min_education_level": 2,
+        "allow_defaulters": false,
+        "pwd_eligible": true,
+        "special_conditions": [
+          "8th Pass (min_education_level 2) required for projects above Rs 10 lakh (manufacturing) or Rs 5 lakh (service)",
+          "Higher subsidy rate (35% vs 25%) for SC/ST/OBC/Women/PwD/Ex-servicemen applicants under reservation category",
+          "New unit only — existing units already availing subsidy under PMEGP/MUDRA are not eligible"
+        ]
+      },
+      "contact_and_apply": {
+        "portal_url": "kviconline.gov.in",
+        "toll_free_helpline": "1800-3000-3468",
+        "support_email": "pmegp-hq@kvic.gov.in",
+        "designated_physical_office": "District Industries Centre (DIC) / KVIC State Office / KVIB"
+      },
+      "application_steps": [
+        "Step 1: Prepare project report, Aadhaar, caste certificate (if applicable), and education proof",
+        "Step 2: Apply online at kviconline.gov.in under the PMEGP e-Portal",
+        "Step 3: Application is forwarded to District Industries Centre / KVIC / KVIB for scrutiny",
+        "Step 4: Selection committee interview and approval, followed by bank loan sanction",
+        "Step 5: Mandatory Entrepreneurship Development Programme (EDP) training, then subsidy is credited via bank on completion"
+      ]
+    },
+    {
+      "scheme_id": "MFS04",
+      "scheme_name": "NSFDC Micro Finance Scheme",
+      "issuing_authority": "National SC Finance and Development Corporation (NSFDC)",
+      "loan_category": "SC Concessional Micro Finance",
+      "max_loan_amount": 140000,
+      "min_loan_amount": 10000,
+      "interest_rate": 6.0,
+      "interest_rate_range": "6.0% p.a. (Fixed Concessional)",
+      "moratorium_months": 3,
+      "funding_pct": 90,
+      "purpose": "micro",
+      "eligibility_rules": {
+        "min_age": 18,
+        "max_age": 70,
+        "allowed_genders": ["Male", "Female", "Other"],
+        "allowed_castes": ["SC"],
+        "min_education_level": 0,
+        "allow_defaulters": false,
+        "pwd_eligible": true,
+        "special_conditions": [
+          "Family income up to Rs 5,00,000 per annum",
+          "Applicant must belong to Scheduled Caste (SC) community",
+          "Disbursed through State Channelizing Agencies (SCAs) and RRBs"
+        ]
+      },
+      "contact_and_apply": {
+        "portal_url": "nsfdc.nic.in",
+        "toll_free_helpline": "1800-11-0031",
+        "support_email": "support@nsfdc.nic.in",
+        "designated_physical_office": "State Channelizing Agency (SCA) District Office / Gramin Bank Branch"
+      },
+      "application_steps": [
+        "Step 1: Obtain SC caste certificate, income certificate (<= Rs 5 lakh), and Aadhaar",
+        "Step 2: Visit local District State Channelizing Agency (SCA) or nominated RRB branch",
+        "Step 3: Fill NSFDC Micro Finance Form indicating proposed small business trade",
+        "Step 4: District screening committee verifies documents and forwards for sanction",
+        "Step 5: Concessional funds released directly to bank account with 3-month moratorium"
+      ]
+    },
+    {
+      "scheme_id": "TLS05",
+      "scheme_name": "NSFDC Term Loan Scheme",
+      "issuing_authority": "National SC Finance and Development Corporation (NSFDC)",
+      "loan_category": "SC Concessional Term Loan",
+      "max_loan_amount": 5000000,
+      "min_loan_amount": 140000,
+      "interest_rate": 7.5,
+      "interest_rate_range": "7.5% p.a. (Fixed Concessional)",
+      "moratorium_months": 6,
+      "funding_pct": 90,
+      "purpose": "term",
+      "eligibility_rules": {
+        "min_age": 18,
+        "max_age": 70,
+        "allowed_genders": ["Male", "Female", "Other"],
+        "allowed_castes": ["SC"],
+        "min_education_level": 0,
+        "allow_defaulters": false,
+        "pwd_eligible": true,
+        "special_conditions": [
+          "Family income up to Rs 5,00,000 per annum",
+          "Applicant must belong to Scheduled Caste (SC) community",
+          "For setting up viable business, transport, service or agricultural enterprise"
+        ]
+      },
+      "contact_and_apply": {
+        "portal_url": "nsfdc.nic.in",
+        "toll_free_helpline": "1800-11-0031",
+        "support_email": "support@nsfdc.nic.in",
+        "designated_physical_office": "State Channelizing Agency (SCA) District Office / Partner Bank"
+      },
+      "application_steps": [
+        "Step 1: Formulate project report outlining machinery, working capital, and viability",
+        "Step 2: Submit application with caste and income certificates to District SCA",
+        "Step 3: State agency appraises project feasibility and sanctions loan portion",
+        "Step 4: Promoter contributes 10% margin money, 90% financed at 7.5% rate",
+        "Step 5: Repayment starts after 6-month moratorium over up to 7 years"
+      ]
+    },
+    {
+      "scheme_id": "ELS06",
+      "scheme_name": "NSFDC Educational Loan Scheme (ELK)",
+      "issuing_authority": "National SC Finance and Development Corporation (NSFDC)",
+      "loan_category": "SC Concessional Education Loan",
+      "max_loan_amount": 2000000,
+      "min_loan_amount": 50000,
+      "interest_rate": 4.0,
+      "interest_rate_range": "4.0% p.a. (0.5% rebate for women)",
+      "moratorium_months": 12,
+      "funding_pct": 90,
+      "purpose": "education",
+      "eligibility_rules": {
+        "min_age": 18,
+        "max_age": 35,
+        "allowed_genders": ["Male", "Female", "Other"],
+        "allowed_castes": ["SC"],
+        "min_education_level": 4,
+        "allow_defaulters": false,
+        "pwd_eligible": true,
+        "special_conditions": [
+          "Family income up to Rs 5,00,000 per annum",
+          "Admission secured in recognized professional/technical higher education course in India or abroad",
+          "12th Pass minimum education qualification"
+        ]
+      },
+      "contact_and_apply": {
+        "portal_url": "nsfdc.nic.in",
+        "toll_free_helpline": "1800-11-0031",
+        "support_email": "education@nsfdc.nic.in",
+        "designated_physical_office": "State SC/ST Development Corp Office / District Education Desk"
+      },
+      "application_steps": [
+        "Step 1: Secure admission letter and fee breakdown from recognized university/college",
+        "Step 2: Submit caste certificate, income proof, and marksheets to District SCA",
+        "Step 3: SCA processes and disburses tuition fees directly to the academic institution",
+        "Step 4: Moratorium valid throughout course duration plus 1 year (12 months post-course)",
+        "Step 5: Highly subsidized 4% interest rate with 10-year flexible repayment"
+      ]
+    },
+    {
+      "scheme_id": "MMCS07",
+      "scheme_name": "Mahila Micro Credit Scheme (MMCS)",
+      "issuing_authority": "National SC Finance and Development Corporation (NSFDC)",
+      "loan_category": "SC Women Micro Credit",
+      "max_loan_amount": 140000,
+      "min_loan_amount": 10000,
+      "interest_rate": 4.0,
+      "interest_rate_range": "4.0% p.a. (Subsidized for Women)",
+      "moratorium_months": 3,
+      "funding_pct": 95,
+      "purpose": "micro",
+      "eligibility_rules": {
+        "min_age": 18,
+        "max_age": 35,
+        "allowed_genders": ["Female"],
+        "allowed_castes": ["SC"],
+        "min_education_level": 0,
+        "allow_defaulters": false,
+        "pwd_eligible": true,
+        "special_conditions": [
+          "Exclusive to Scheduled Caste women entrepreneurs aged up to 35 years",
+          "Family income up to Rs 5,00,000 per annum",
+          "95% project cost financed with minimal 5% margin money"
+        ]
+      },
+      "contact_and_apply": {
+        "portal_url": "nsfdc.nic.in",
+        "toll_free_helpline": "1800-11-0031",
+        "support_email": "mahila@nsfdc.nic.in",
+        "designated_physical_office": "District SCA Office / Self-Help Group (SHG) Federation"
+      },
+      "application_steps": [
+        "Step 1: SC women applicants can apply individually or through registered SHGs",
+        "Step 2: Provide Aadhaar, SC certificate, income proof, and brief trade plan",
+        "Step 3: Fast-track approval via District SCA Women Empowerment Cell",
+        "Step 4: Concessional funds disbursed at ultra-low 4% annual interest",
+        "Step 5: Enjoy 3-month moratorium and easy 36 to 60-month monthly repayment"
+      ]
+    }
+  ]
+}

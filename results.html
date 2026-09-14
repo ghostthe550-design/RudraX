@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RudraX — Your Scheme Match Results</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand-row">
+      <div class="brand-identity">
+        <div class="brand-shield">RX</div>
+        <div class="brand-text">
+          <h1>RudraX</h1>
+          <p>Concessional Finance Navigator & Eligibility Shield</p>
+        </div>
+      </div>
+    </div>
+    <nav class="site-nav">
+      <a href="{{ url_for('index') }}" class="nav-link">1. Scheme Matcher</a>
+      <a href="{{ url_for('compare') }}" class="nav-link">2. Compare Lenders</a>
+      <a href="{{ url_for('navigator') }}" class="nav-link">3. EMI Calculator &amp; Partner Map</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <div class="page-title-section">
+    <h2>Your Evaluated Scheme Compatibility</h2>
+    <p>Based on your profile, here is the transparent breakdown of which central and state concessional loan schemes match your requirements, ranked by compatibility.</p>
+  </div>
+
+  {% if user %}
+  <div class="results-summary-card">
+    <div>
+      <strong style="display:block; font-size: 0.88rem; color: var(--iron-500); text-transform: uppercase;">Evaluated Profile:</strong>
+      <div class="profile-pills" style="margin-top: 6px;">
+        <span class="profile-pill">Age: {{ user.age }} yrs</span>
+        <span class="profile-pill">Gender: {{ user.gender }}</span>
+        <span class="profile-pill">Caste: {{ user.caste_category }}</span>
+        <span class="profile-pill">Education Level: {{ user.education_level }}</span>
+        <span class="profile-pill">Divyang: {{ 'Yes' if user.is_pwd else 'No' }}</span>
+        <span class="profile-pill">Credit Default: {{ 'Yes' if user.has_loan_default else 'None (Clean)' }}</span>
+      </div>
+    </div>
+    <a href="{{ url_for('index') }}" class="btn-outline btn-sm">Edit Profile</a>
+  </div>
+  {% endif %}
+
+  {% for r in results %}
+  <section class="scheme-card status-{{ r.status | replace(' ', '-') | lower }}">
+
+    <div class="scheme-card-head">
+      <div>
+        <h2>{{ r.scheme_name }}</h2>
+        <span class="scheme-authority">{{ r.issuing_authority }} &middot; <em>{{ r.loan_category }}</em></span>
+      </div>
+      <span class="status-badge">{{ r.status }}</span>
+    </div>
+
+    <div class="score-section">
+      <div class="score-bar-track" role="progressbar" aria-valuenow="{{ r.match_score }}" aria-valuemin="0" aria-valuemax="100">
+        <div class="score-bar-fill" style="width: {{ r.match_score }}%;"></div>
+      </div>
+      <div class="score-meta">
+        <span>Eligibility Compatibility</span>
+        <span>{{ r.match_score }}% Match</span>
+      </div>
+    </div>
+
+    <div class="scheme-metrics-strip">
+      <div class="metric-item">Max Loan: <strong>₹{{ '{:,}'.format(r.max_loan_amount) }}</strong></div>
+      <div class="metric-item">Interest Rate: <strong>{{ r.interest_rate_range }}</strong></div>
+      <div class="metric-item">Scheme ID: <strong>{{ r.scheme_id }}</strong></div>
+    </div>
+
+    {% if r.reasons_pass %}
+    <div class="reasons">
+      <h3>Why You Qualify</h3>
+      <ul class="reasons-pass">
+        {% for reason in r.reasons_pass %}
+        <li>{{ reason }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    {% if r.reasons_fail %}
+    <div class="reasons">
+      <h3>Areas of Non-Compliance / Gaps</h3>
+      <ul class="reasons-fail">
+        {% for reason in r.reasons_fail %}
+        <li>{{ reason }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    {% if r.application_steps %}
+    <div class="steps">
+      <h3>Application &amp; Sanction Roadmap</h3>
+      <ol>
+        {% for step in r.application_steps %}
+        <li>{{ step }}</li>
+        {% endfor %}
+      </ol>
+    </div>
+    {% endif %}
+
+    {% if r.contact_and_apply %}
+    <div class="contact-box">
+      <h3>Designated Contact &amp; Application Channels</h3>
+      <div class="contact-grid">
+        {% if r.contact_and_apply.portal_url %}
+        <div class="contact-item">
+          <strong>Official Portal</strong>
+          <a href="https://{{ r.contact_and_apply.portal_url }}" target="_blank" rel="noopener noreferrer">
+            {{ r.contact_and_apply.portal_url }} &UpperRightArrow;
+          </a>
+        </div>
+        {% endif %}
+
+        {% if r.contact_and_apply.toll_free_helpline %}
+        <div class="contact-item">
+          <strong>Toll-Free Helpline</strong>
+          <a href="tel:{{ r.contact_and_apply.toll_free_helpline }}">{{ r.contact_and_apply.toll_free_helpline }}</a>
+        </div>
+        {% endif %}
+
+        {% if r.contact_and_apply.support_email %}
+        <div class="contact-item">
+          <strong>Official Support Email</strong>
+          <a href="mailto:{{ r.contact_and_apply.support_email }}">{{ r.contact_and_apply.support_email }}</a>
+        </div>
+        {% endif %}
+
+        {% if r.contact_and_apply.designated_physical_office %}
+        <div class="contact-item">
+          <strong>Physical Office / Desk</strong>
+          <span>{{ r.contact_and_apply.designated_physical_office }}</span>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="card-actions">
+      <a href="{{ url_for('navigator') }}?scheme={{ r.scheme_id }}&amount={{ r.max_loan_amount }}" class="btn-primary btn-sm">
+        Calculate EMI for this Scheme &rarr;
+      </a>
+      <a href="{{ url_for('navigator') }}#locator" class="btn-outline btn-sm">
+        Locate Nearby Disbursing Branch &rarr;
+      </a>
+    </div>
+
+  </section>
+  {% endfor %}
+
+  <div style="display: flex; gap: 14px; flex-wrap: wrap; margin-top: 30px;">
+    <a href="{{ url_for('index') }}" class="btn-secondary">Check Another Profile</a>
+    <a href="{{ url_for('compare') }}" class="btn-outline">Compare All Lenders &amp; Schemes &rarr;</a>
+  </div>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <p>This match report is generated deterministically from government scheme rule matrices. Final loan appraisal is conducted by the disbursing financial institution.</p>
+    <p class="attribution">Developed for <strong>Smart India Hackathon (SIH)</strong> &middot; Team <strong>RudraX</strong></p>
+  </div>
+</footer>
+
+</body>
+</html>

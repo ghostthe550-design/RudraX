@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RudraX — Government Scheme Matcher & Eligibility Shield</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand-row">
+      <div class="brand-identity">
+        <div class="brand-shield">RX</div>
+        <div class="brand-text">
+          <h1>RudraX</h1>
+          <p>Concessional Finance Navigator & Eligibility Shield</p>
+        </div>
+      </div>
+    </div>
+    <nav class="site-nav">
+      <a href="{{ url_for('index') }}" class="nav-link active">1. Scheme Matcher</a>
+      <a href="{{ url_for('compare') }}" class="nav-link">2. Compare Lenders</a>
+      <a href="{{ url_for('navigator') }}" class="nav-link">3. EMI Calculator &amp; Partner Map</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <div class="page-title-section">
+    <h2>Find Your Concessional Government Scheme</h2>
+    <p>Answer a few straightforward profile questions. Our transparent rules engine evaluates eligibility, computes compatibility scores, and details exact qualification reasons.</p>
+  </div>
+
+  {% if request.args.get('error') == 'invalid_input' %}
+    <div class="alert alert-danger" role="alert">
+      <span><strong>Missing Information:</strong> Please ensure every profile field is completed (including gender, caste, education, disability, and credit status).</span>
+    </div>
+  {% elif request.args.get('error') == 'age_out_of_range' %}
+    <div class="alert alert-danger" role="alert">
+      <span><strong>Invalid Age:</strong> Applicant age must be between 18 and 99 years.</span>
+    </div>
+  {% endif %}
+
+  <form action="{{ url_for('results') }}" method="POST" class="form-card">
+
+    <fieldset>
+      <legend>Applicant Profile</legend>
+      <div class="grid-2">
+        <div class="field">
+          <label for="age">Your Age (Years) *</label>
+          <input type="number" id="age" name="age" min="18" max="99" placeholder="e.g. 26" required>
+        </div>
+
+        <div class="field">
+          <label for="gender">Gender *</label>
+          <select id="gender" name="gender" required>
+            <option value="" disabled selected>Select gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label for="caste_category">Social / Caste Category *</label>
+          <select id="caste_category" name="caste_category" required>
+            <option value="" disabled selected>Select category</option>
+            <option value="SC">Scheduled Caste (SC)</option>
+            <option value="ST">Scheduled Tribe (ST)</option>
+            <option value="OBC">Other Backward Class (OBC)</option>
+            <option value="General">General</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="education_level">Highest Education Qualification *</label>
+          <select id="education_level" name="education_level" required>
+            <option value="" disabled selected>Select education level</option>
+            <option value="0">No formal education</option>
+            <option value="1">Below 8th pass</option>
+            <option value="2">8th pass</option>
+            <option value="3">10th pass (Matriculation)</option>
+            <option value="4">12th pass (Intermediate)</option>
+            <option value="5">Graduate (Degree)</option>
+            <option value="6">Post-graduate &amp; Above</option>
+          </select>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Special Eligibility &amp; Credit History</legend>
+
+      <div class="field">
+        <span class="radio-legend">Are you a Person with Disability (Divyang)? *</span>
+        <div class="radio-row">
+          <label><input type="radio" name="is_pwd" value="Yes" required> Yes</label>
+          <label><input type="radio" name="is_pwd" value="No" checked> No</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="radio-legend">Do you have a history of bank loan defaults or settlement write-offs? *</span>
+        <div class="radio-row">
+          <label><input type="radio" name="has_loan_default" value="Yes" required> Yes (History of default)</label>
+          <label><input type="radio" name="has_loan_default" value="No" checked> No (Clean credit record)</label>
+        </div>
+      </div>
+    </fieldset>
+
+    <button type="submit" class="btn-primary btn-block">
+      <span>Show My Matching Schemes &rarr;</span>
+    </button>
+  </form>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <p>This platform provides deterministic, explainable eligibility matching based on official guidelines. Always confirm final loan sanction with the designated bank or channel agency.</p>
+    <p class="attribution">Developed for <strong>Smart India Hackathon (SIH)</strong> &middot; Team <strong>RudraX</strong></p>
+  </div>
+</footer>
+
+</body>
+</html>

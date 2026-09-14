@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RudraX — EMI Calculator &amp; Geo-Spatial Partner Locator</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    .tab-navigation-bar {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 24px;
+      background: var(--iron-100);
+      padding: 6px;
+      border-radius: var(--radius-sm);
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 12px 14px;
+      border: none;
+      background: transparent;
+      color: var(--iron-600);
+      font-weight: 600;
+      font-size: 0.92rem;
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      transition: all 0.2s ease;
+      text-align: center;
+      font-family: inherit;
+    }
+    .tab-btn.active {
+      background: #FFFFFF;
+      color: var(--iron-900);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .tool-panel {
+      display: none;
+      background: #FFFFFF;
+      border: 1px solid var(--iron-200);
+      border-radius: var(--radius-md);
+      padding: 28px;
+      box-shadow: var(--shadow-sm);
+    }
+    .tool-panel.active {
+      display: block;
+    }
+
+    /* Calculator Output Display */
+    .calc-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+    @media (max-width: 768px) {
+      .calc-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .calc-display-card {
+      background: linear-gradient(135deg, var(--iron-900) 0%, var(--iron-800) 100%);
+      color: #FFFFFF;
+      border-radius: var(--radius-md);
+      padding: 24px;
+      border-top: 4px solid var(--ember-500);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .calc-display-card .sub-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--ember-400);
+      font-weight: 700;
+    }
+    .calc-display-card .emi-amount {
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 2.3rem;
+      color: #FFFFFF;
+      margin: 8px 0 16px;
+      font-weight: 700;
+    }
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      font-size: 0.92rem;
+    }
+    .stat-row:last-child {
+      border-bottom: none;
+    }
+    .stat-row span {
+      color: var(--iron-400);
+    }
+    .stat-row strong {
+      color: #FFFFFF;
+    }
+
+    /* Map & Partner Styling */
+    #map {
+      height: 380px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--iron-200);
+      margin: 18px 0;
+      z-index: 1;
+    }
+
+    .partner-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid var(--iron-200);
+      border-radius: var(--radius-sm);
+      padding: 14px 18px;
+      margin-bottom: 12px;
+      background: #FFFFFF;
+      transition: all 0.2s ease;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .partner-card:hover {
+      border-color: var(--iron-400);
+      box-shadow: var(--shadow-sm);
+    }
+    .partner-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 10px;
+      background: var(--iron-100);
+      color: var(--iron-700);
+      margin-left: 6px;
+    }
+    .score-badge {
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 16px;
+      white-space: nowrap;
+    }
+    .score-badge.high {
+      background: var(--success-bg);
+      color: var(--success);
+      border: 1px solid var(--success-border);
+    }
+    .score-badge.med {
+      background: var(--warning-bg);
+      color: var(--warning);
+      border: 1px solid var(--warning-border);
+    }
+    .score-badge.low {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid var(--danger-border);
+    }
+
+    .hint-subtext {
+      font-size: 0.82rem;
+      color: var(--iron-500);
+      margin-top: 4px;
+    }
+    .moratorium-banner {
+      background: var(--warning-bg);
+      border: 1px solid var(--warning-border);
+      color: var(--warning);
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 0.86rem;
+      font-weight: 600;
+      margin-top: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand-row">
+      <div class="brand-identity">
+        <div class="brand-shield">RX</div>
+        <div class="brand-text">
+          <h1>RudraX</h1>
+          <p>Concessional Finance Navigator &amp; Eligibility Shield</p>
+        </div>
+      </div>
+    </div>
+    <nav class="site-nav">
+      <a href="{{ url_for('index') }}" class="nav-link">1. Scheme Matcher</a>
+      <a href="{{ url_for('compare') }}" class="nav-link">2. Compare Lenders</a>
+      <a href="{{ url_for('navigator') }}" class="nav-link active">3. EMI Calculator &amp; Partner Map</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <div class="page-title-section">
+    <h2>Financial Navigator &amp; Partner Locator</h2>
+    <p>Estimate monthly repayments with scheme-aware moratorium rules, and locate nearby channel agencies and branches ranked by weighted fund health &amp; NPA safety.</p>
+  </div>
+
+  <div class="tab-navigation-bar">
+    <button class="tab-btn active" data-tab="calculator" onclick="switchTab('calculator')">1. EMI Calculator</button>
+    <button class="tab-btn" data-tab="locator" onclick="switchTab('locator')">2. Nearest Channel Partner</button>
+    <button class="tab-btn" data-tab="quick-finder" onclick="switchTab('quick-finder')">3. Quick Filter</button>
+  </div>
+
+  <!-- ================= CALCULATOR ================= -->
+  <section class="tool-panel active" id="calculator">
+    <h3 style="margin-bottom: 16px;">Scheme-Aware EMI &amp; Repayment Calculator</h3>
+
+    <div class="field">
+      <label for="scheme-select">Select Concessional Scheme</label>
+      <select id="scheme-select" onchange="onSchemeChange()"></select>
+    </div>
+
+    <div class="calc-layout">
+      <div>
+        <div class="field">
+          <label>Loan Amount: ₹<span id="amt-val" style="color: var(--ember-600); font-weight: 700;">1,00,000</span></label>
+          <input type="range" id="amt-slider" min="10000" max="5000000" step="10000" value="100000" oninput="calcEMI()">
+          <div class="hint-subtext">Adjust the slider or pick a scheme to autofill typical limits.</div>
+        </div>
+
+        <div class="field">
+          <label>Repayment Tenure: <span id="ten-val" style="color: var(--ember-600); font-weight: 700;">36</span> Months</label>
+          <input type="range" id="ten-slider" min="6" max="120" step="6" value="36" oninput="calcEMI()">
+          <div class="hint-subtext" id="tenure-hint">Max tenure depends on scheme guidelines.</div>
+        </div>
+
+        <div class="field">
+          <label for="rate-input">Annual Interest Rate (% p.a.)</label>
+          <input type="number" id="rate-input" step="0.1" min="1" max="25" oninput="calcEMI()">
+        </div>
+
+        <div class="moratorium-banner" id="moratorium-note">
+          No EMI during moratorium period. Repayment commences thereafter.
+        </div>
+      </div>
+
+      <div class="calc-display-card">
+        <div>
+          <div class="sub-label">Estimated Monthly Installment (Post-Moratorium)</div>
+          <div class="emi-amount" id="emi-out">₹0</div>
+        </div>
+        <div>
+          <div class="stat-row">
+            <span>Principal Sanction</span>
+            <strong id="principal-out">₹0</strong>
+          </div>
+          <div class="stat-row">
+            <span>Total Interest Payable</span>
+            <strong id="interest-out">₹0</strong>
+          </div>
+          <div class="stat-row">
+            <span>Total Repayment (P + I)</span>
+            <strong id="total-out">₹0</strong>
+          </div>
+          <div class="stat-row">
+            <span>Moratorium Grace Period</span>
+            <strong id="mora-out">—</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= LOCATOR ================= -->
+  <section class="tool-panel" id="locator">
+    <h3>Geo-Spatial Channel Partner Locator</h3>
+    <p class="hint-subtext" style="margin-bottom: 12px;">
+      Partners are ranked using the official SIH scoring formula: 
+      <code>Score = 0.5 &times; (1 / (1 + Dist/50)) + 0.3 &times; (Fund/100) + 0.2 &times; (1 - NPA)</code>.
+      This ensures applications are guided to branches with active fund headroom and low NPA risk, not distance alone.
+    </p>
+
+    <div id="map"></div>
+    <div style="font-size: 0.86rem; color: var(--iron-600); margin: 8px 0;" id="locator-status">Initializing branch mapping…</div>
+    <div id="partner-list"></div>
+  </section>
+
+  <!-- ================= QUICK FILTER ================= -->
+  <section class="tool-panel" id="quick-finder">
+    <h3>Quick In-Browser Scheme Recommender</h3>
+    <p class="hint-subtext" style="margin-bottom: 20px;">For the comprehensive 5-point expert system, use the <a href="{{ url_for('index') }}" style="color: var(--ember-600); font-weight: 600;">Main Scheme Matcher</a>.</p>
+
+    <div class="grid-2">
+      <div class="field">
+        <label for="q-age">Applicant Age</label>
+        <input type="number" id="q-age" value="26" min="18" max="75">
+      </div>
+      <div class="field">
+        <label>Gender</label>
+        <div class="radio-row">
+          <label><input type="radio" name="q-gender" value="Male" checked> Male</label>
+          <label><input type="radio" name="q-gender" value="Female"> Female</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="field">
+        <label for="q-income">Annual Family Income (₹)</label>
+        <input type="number" id="q-income" value="250000" step="25000">
+      </div>
+      <div class="field">
+        <label for="q-purpose">Primary Loan Purpose</label>
+        <select id="q-purpose">
+          <option value="micro">Small Business / Micro Trade</option>
+          <option value="term">Large Project / Manufacturing Unit</option>
+          <option value="education">Higher Education Course</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="q-amount">Required Loan Amount (₹)</label>
+      <input type="number" id="q-amount" value="100000" step="10000">
+    </div>
+
+    <button class="btn-primary" onclick="runQuickFilter()">Find Matches In Catalog &rarr;</button>
+
+    <div id="quick-results" style="margin-top: 24px;"></div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <p>Interest rates, moratorium periods, and channel partner rankings are indicative and derived from official RBI and NSFDC notifications.</p>
+    <p class="attribution">Developed for <strong>Smart India Hackathon (SIH)</strong> &middot; Team <strong>RudraX</strong></p>
+  </div>
+</footer>
+
+<script>
+/* ===============================================================
+   1. SCHEMES DATABASE (Client-side mirror & API sync)
+   =============================================================== */
+let SCHEMES = [
+  { id: 'PMMY01', name: 'PM MUDRA Yojana', maxLoan: 1000000, rate: 8.5, moratorium: 3, maxTenure: 60, purpose: 'micro' },
+  { id: 'SUI02',  name: 'Stand-Up India Scheme', maxLoan: 10000000, rate: 9.5, moratorium: 6, maxTenure: 84, purpose: 'term' },
+  { id: 'PMEGP03', name: 'PMEGP (KVIC/DIC)', maxLoan: 5000000, rate: 10.5, moratorium: 6, maxTenure: 84, purpose: 'term' },
+  { id: 'MFS04',  name: 'NSFDC Micro Finance Scheme', maxLoan: 140000, rate: 6.0, moratorium: 3, maxTenure: 60, purpose: 'micro' },
+  { id: 'TLS05',  name: 'NSFDC Term Loan Scheme', maxLoan: 5000000, rate: 7.5, moratorium: 6, maxTenure: 84, purpose: 'term' },
+  { id: 'ELS06',  name: 'NSFDC Educational Loan Scheme', maxLoan: 2000000, rate: 4.0, moratorium: 12, maxTenure: 120, purpose: 'education' },
+  { id: 'MMCS07', name: 'Mahila Micro Credit Scheme', maxLoan: 140000, rate: 4.0, moratorium: 3, maxTenure: 60, purpose: 'micro' }
+];
+
+// Try fetching dynamic schemes from Flask backend API if available
+fetch('/api/schemes')
+  .then(res => res.json())
+  .then(data => {
+    if (data && data.schemes && data.schemes.length > 0) {
+      SCHEMES = data.schemes.map(s => ({
+        id: s.scheme_id,
+        name: s.scheme_name,
+        maxLoan: s.max_loan_amount,
+        rate: s.interest_rate || 8.0,
+        moratorium: s.moratorium_months || 3,
+        maxTenure: 84,
+        purpose: s.purpose || 'micro'
+      }));
+      populateSchemeSelect();
+      handleUrlParams();
+    }
+  })
+  .catch(() => {
+    // Fallback to embedded catalog
+    populateSchemeSelect();
+    handleUrlParams();
+  });
+
+function populateSchemeSelect() {
+  const sel = document.getElementById('scheme-select');
+  sel.innerHTML = SCHEMES.map(s => `<option value="${s.id}">${s.name} (Max ₹${s.maxLoan.toLocaleString('en-IN')})</option>`).join('');
+  onSchemeChange();
+}
+
+function onSchemeChange() {
+  const selVal = document.getElementById('scheme-select').value;
+  const s = SCHEMES.find(x => x.id === selVal) || SCHEMES[0];
+  if (!s) return;
+
+  document.getElementById('rate-input').value = s.rate;
+  document.getElementById('ten-slider').max = s.maxTenure;
+  document.getElementById('amt-slider').max = s.maxLoan;
+
+  // If current slider amount exceeds max loan, adjust it
+  let currAmt = parseFloat(document.getElementById('amt-slider').value);
+  if (currAmt > s.maxLoan) {
+    document.getElementById('amt-slider').value = s.maxLoan;
+  }
+
+  document.getElementById('moratorium-note').textContent =
+    `Moratorium Guarantee: No principal or EMI payment required for the first ${s.moratorium} months. Repayment schedule commences in Month ${s.moratorium + 1}.`;
+  document.getElementById('tenure-hint').textContent = `Max allowable tenure for this scheme: ${s.maxTenure} months.`;
+
+  calcEMI();
+}
+
+function calcEMI() {
+  const P = parseFloat(document.getElementById('amt-slider').value) || 0;
+  const n = parseFloat(document.getElementById('ten-slider').value) || 12;
+  const annualRate = parseFloat(document.getElementById('rate-input').value) || 0;
+  const r = annualRate / 12 / 100;
+
+  document.getElementById('amt-val').textContent = P.toLocaleString('en-IN');
+  document.getElementById('ten-val').textContent = n;
+
+  let emi = 0;
+  if (r === 0) {
+    emi = P / n;
+  } else {
+    emi = P * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+  }
+
+  const total = emi * n;
+  const interest = total - P;
+
+  const selVal = document.getElementById('scheme-select').value;
+  const s = SCHEMES.find(x => x.id === selVal) || SCHEMES[0];
+
+  document.getElementById('emi-out').textContent = '₹' + Math.round(emi).toLocaleString('en-IN');
+  document.getElementById('principal-out').textContent = '₹' + Math.round(P).toLocaleString('en-IN');
+  document.getElementById('interest-out').textContent = '₹' + Math.round(interest).toLocaleString('en-IN');
+  document.getElementById('total-out').textContent = '₹' + Math.round(total).toLocaleString('en-IN');
+  document.getElementById('mora-out').textContent = (s ? s.moratorium : 3) + ' Months';
+}
+
+/* ===============================================================
+   2. GEO-SPATIAL PARTNER LOCATOR (Leaflet + Weighted Formula)
+   Formula: 0.5 * (1/(1+dist/50)) + 0.3 * (fund/100) + 0.2 * (1 - npa)
+   =============================================================== */
+const MOCK_PARTNERS = [
+  { name: 'State Channelizing Agency (SCA) District Office', type: 'SCA', lat: 25.5941, lng: 85.1376, fund_availability: 88, npa_ratio: 0.04, phone: '0612-2234901', address: 'Fraser Road, Patna' },
+  { name: 'Canara Bank — Dedicated Priority Sector Cell', type: 'PSB', lat: 25.6100, lng: 85.1600, fund_availability: 75, npa_ratio: 0.06, phone: '1800-425-0018', address: 'Exhibition Road, Patna' },
+  { name: 'Uttar Bihar Gramin Bank — Head Office', type: 'RRB', lat: 25.5500, lng: 85.0900, fund_availability: 92, npa_ratio: 0.03, phone: '0612-2581023', address: 'Kalambagh Chowk' },
+  { name: 'Punjab National Bank — Social Banking Desk', type: 'PSB', lat: 25.6000, lng: 85.0700, fund_availability: 68, npa_ratio: 0.08, phone: '1800-180-2222', address: 'Station Road' },
+  { name: 'Satin Creditcare NBFC-MFI Disbursal Centre', type: 'NBFC-MFI', lat: 25.5800, lng: 85.2200, fund_availability: 62, npa_ratio: 0.09, phone: '1800-102-7777', address: 'Kankarbagh Main Road' },
+  { name: 'District Industries Centre (DIC / PMEGP Cell)', type: 'DIC', lat: 25.6250, lng: 85.1200, fund_availability: 95, npa_ratio: 0.02, phone: '0612-2287104', address: 'Industrial Estate, Patliputra' }
+];
+
+let map = null;
+let userLatLng = [25.5941, 85.1376]; // default centroid (Patna)
+let mapInitialized = false;
+
+function haversine(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function scorePartner(p, distKm) {
+  const distScore = 1 / (1 + distKm / 50);
+  const fundScore = p.fund_availability / 100;
+  const npaScore = 1 - p.npa_ratio;
+  return 0.5 * distScore + 0.3 * fundScore + 0.2 * npaScore;
+}
+
+function initMap() {
+  if (mapInitialized && map) {
+    map.invalidateSize();
+    return;
+  }
+
+  const mapContainer = document.getElementById('map');
+  if (!mapContainer) return;
+
+  map = L.map('map').setView(userLatLng, 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  mapInitialized = true;
+  renderPartners();
+}
+
+function renderPartners() {
+  if (!map) return;
+
+  L.marker(userLatLng).addTo(map).bindPopup('<b>Your Approximate Position</b>').openPopup();
+
+  const ranked = MOCK_PARTNERS.map(p => {
+    const dist = haversine(userLatLng[0], userLatLng[1], p.lat, p.lng);
+    return { ...p, dist, score: scorePartner(p, dist) };
+  }).sort((a, b) => b.score - a.score);
+
+  const list = document.getElementById('partner-list');
+  list.innerHTML = '';
+
+  ranked.forEach((p, idx) => {
+    const tier = p.score > 0.65 ? 'high' : (p.score > 0.45 ? 'med' : 'low');
+    const color = tier === 'high' ? '#276749' : (tier === 'med' ? '#DD6B20' : '#C53030');
+    const tierLabel = tier === 'high' ? 'Recommended Branch' : (tier === 'med' ? 'Usable' : 'Low Headroom');
+
+    L.circleMarker([p.lat, p.lng], { radius: 9, color: color, fillColor: color, fillOpacity: 0.85 })
+      .addTo(map)
+      .bindPopup(`<b>${p.name}</b><br>${p.type} &middot; ${p.dist.toFixed(1)} km away<br>Phone: ${p.phone}`);
+
+    const card = document.createElement('div');
+    card.className = 'partner-card';
+    card.innerHTML = `
+      <div>
+        <div style="font-weight: 700; color: var(--iron-900);">
+          #${idx + 1} ${p.name} <span class="partner-tag">${p.type}</span>
+        </div>
+        <div class="hint-subtext" style="margin-top: 2px;">
+          ${p.address} &middot; <a href="tel:${p.phone}" style="color: var(--ember-600); font-weight: 600;">${p.phone}</a>
+        </div>
+        <div class="hint-subtext">
+          Distance: <strong>${p.dist.toFixed(1)} km</strong> &middot; Fund Headroom: <strong>${p.fund_availability}%</strong> &middot; NPA Ratio: <strong>${(p.npa_ratio * 100).toFixed(1)}%</strong>
+        </div>
+      </div>
+      <div>
+        <span class="score-badge ${tier}">${tierLabel} (Score: ${(p.score * 100).toFixed(0)})</span>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+
+  document.getElementById('locator-status').textContent = 'Showing partners ranked by weighted formula: distance + fund liquidity + NPA security.';
+}
+
+function tryGeolocate() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        userLatLng = [pos.coords.latitude, pos.coords.longitude];
+        initMap();
+      },
+      () => {
+        document.getElementById('locator-status').textContent = 'Location permission not granted — defaulting to regional nodal coordinates.';
+        initMap();
+      }
+    );
+  } else {
+    initMap();
+  }
+}
+
+/* ===============================================================
+   3. TAB SWITCHING & URL ROUTING
+   =============================================================== */
+function switchTab(tabName) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tabName));
+  document.querySelectorAll('.tool-panel').forEach(p => p.classList.toggle('active', p.id === tabName));
+
+  if (tabName === 'locator') {
+    setTimeout(() => {
+      if (!mapInitialized) {
+        tryGeolocate();
+      } else if (map) {
+        map.invalidateSize();
+      }
+    }, 150);
+  }
+}
+
+function handleUrlParams() {
+  const params = new URLSearchParams(window.location.search);
+  const hash = window.location.hash;
+
+  if (hash === '#locator') {
+    switchTab('locator');
+    return;
+  }
+
+  const schemeParam = params.get('scheme');
+  const amountParam = params.get('amount');
+
+  if (schemeParam) {
+    const sel = document.getElementById('scheme-select');
+    if (sel) {
+      sel.value = schemeParam;
+      onSchemeChange();
+    }
+  }
+
+  if (amountParam) {
+    const amt = parseFloat(amountParam);
+    if (amt && !isNaN(amt)) {
+      const slider = document.getElementById('amt-slider');
+      if (slider) {
+        slider.value = amt;
+        calcEMI();
+      }
+    }
+  }
+}
+
+/* ===============================================================
+   4. QUICK FILTER LOGIC
+   =============================================================== */
+function runQuickFilter() {
+  const age = parseFloat(document.getElementById('q-age').value) || 25;
+  const genderElem = document.querySelector('input[name=q-gender]:checked');
+  const gender = genderElem ? genderElem.value : 'Male';
+  const income = parseFloat(document.getElementById('q-income').value) || 0;
+  const purpose = document.getElementById('q-purpose').value;
+  const amount = parseFloat(document.getElementById('q-amount').value) || 0;
+
+  const matches = SCHEMES.filter(s => {
+    if (s.purpose !== purpose && purpose !== 'all') return false;
+    if (amount > s.maxLoan) return false;
+    return true;
+  }).sort((a, b) => a.rate - b.rate);
+
+  const resBox = document.getElementById('quick-results');
+  if (matches.length === 0) {
+    resBox.innerHTML = `<div class="alert alert-danger">No catalog scheme directly matches the requested purpose & amount combination. Try adjusting the required loan ceiling.</div>`;
+    return;
+  }
+
+  resBox.innerHTML = `<h4 style="margin-bottom: 12px; color: var(--iron-900);">Matching Options (${matches.length})</h4>` +
+    matches.map(m => `
+      <div class="partner-card">
+        <div>
+          <strong style="font-size: 1.05rem;">${m.name}</strong>
+          <div class="hint-subtext">Rate: <strong>${m.rate}% p.a.</strong> &middot; Max Loan: <strong>₹${m.maxLoan.toLocaleString('en-IN')}</strong> &middot; Moratorium: <strong>${m.moratorium} mos</strong></div>
+        </div>
+        <button class="btn-primary btn-sm" onclick="sendToCalc('${m.id}', ${amount})">Simulate Repayment &rarr;</button>
+      </div>
+    `).join('');
+}
+
+function sendToCalc(schemeId, amount) {
+  switchTab('calculator');
+  document.getElementById('scheme-select').value = schemeId;
+  onSchemeChange();
+  if (amount > 0) {
+    document.getElementById('amt-slider').value = amount;
+    calcEMI();
+  }
+}
+
+// Initialize on page load
+window.addEventListener('DOMContentLoaded', () => {
+  populateSchemeSelect();
+  handleUrlParams();
+});
+</script>
+
+</body>
+</html>
