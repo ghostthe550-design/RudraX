@@ -185,15 +185,22 @@
       <div class="brand-identity">
         <div class="brand-shield">US</div>
         <div class="brand-text">
-          <h1>UDYAMSetu</h1>
-          <p>Concessional Finance Navigator &amp; Eligibility Shield</p>
+          <h1 data-i18n="brand.title">UDYAMSetu</h1>
+          <p data-i18n="brand.tagline">Concessional Finance Navigator &amp; Eligibility Shield</p>
         </div>
+      </div>
+
+      <div class="lang-switcher" id="lang-switcher">
+        <span class="lang-icon" aria-hidden="true">🌐</span>
+        <button type="button" class="lang-btn active" data-lang="en" onclick="setLanguage('en')">English</button>
+        <span class="lang-divider">|</span>
+        <button type="button" class="lang-btn" data-lang="hi" onclick="setLanguage('hi')">हिन्दी</button>
       </div>
     </div>
     <nav class="site-nav">
-      <a href="{{ url_for('index') }}" class="nav-link">1. Scheme Matcher</a>
-      <a href="{{ url_for('compare') }}" class="nav-link">2. Compare Lenders</a>
-      <a href="{{ url_for('navigator') }}" class="nav-link active">3. EMI Calculator &amp; Partner Map</a>
+      <a href="{{ url_for('index') }}" class="nav-link" data-i18n="nav.matcher">1. Scheme Matcher</a>
+      <a href="{{ url_for('compare') }}" class="nav-link" data-i18n="nav.compare">2. Compare Lenders</a>
+      <a href="{{ url_for('navigator') }}" class="nav-link active" data-i18n="nav.navigator">3. EMI Calculator &amp; Partner Map</a>
     </nav>
   </div>
 </header>
@@ -201,41 +208,41 @@
 <main>
 
   <div class="page-title-section">
-    <h2>Financial Navigator &amp; Partner Locator</h2>
-    <p>Estimate monthly repayments with scheme-aware moratorium rules, and locate nearby channel agencies and branches ranked by weighted fund health &amp; NPA safety.</p>
+    <h2 data-i18n="navigator.hero_title">Financial Navigator &amp; Partner Locator</h2>
+    <p data-i18n="navigator.hero_subtitle">Estimate monthly repayments with scheme-aware moratorium rules, and locate nearby channel agencies and branches ranked by weighted fund health &amp; NPA safety.</p>
   </div>
 
   <div class="tab-navigation-bar">
-    <button class="tab-btn active" data-tab="calculator" onclick="switchTab('calculator')">1. EMI Calculator</button>
-    <button class="tab-btn" data-tab="locator" onclick="switchTab('locator')">2. Nearest Channel Partner</button>
-    <button class="tab-btn" data-tab="quick-finder" onclick="switchTab('quick-finder')">3. Quick Filter</button>
+    <button class="tab-btn active" data-tab="calculator" onclick="switchTab('calculator')" data-i18n="navigator.tab_calc">1. EMI Calculator</button>
+    <button class="tab-btn" data-tab="locator" onclick="switchTab('locator')" data-i18n="navigator.tab_locator">2. Nearest Channel Partner</button>
+    <button class="tab-btn" data-tab="quick-finder" onclick="switchTab('quick-finder')" data-i18n="navigator.tab_quick">3. Quick Filter</button>
   </div>
 
   <!-- ================= CALCULATOR ================= -->
   <section class="tool-panel active" id="calculator">
-    <h3 style="margin-bottom: 16px;">Scheme-Aware EMI &amp; Repayment Calculator</h3>
+    <h3 style="margin-bottom: 16px;" data-i18n="navigator.tab_calc">Scheme-Aware EMI &amp; Repayment Calculator</h3>
 
     <div class="field">
-      <label for="scheme-select">Select Concessional Scheme</label>
+      <label for="scheme-select" data-i18n="navigator.calc_select_scheme">Select Concessional Scheme</label>
       <select id="scheme-select" onchange="onSchemeChange()"></select>
     </div>
 
     <div class="calc-layout">
       <div>
         <div class="field">
-          <label>Loan Amount: ₹<span id="amt-val" style="color: var(--ember-600); font-weight: 700;">1,00,000</span></label>
+          <label><span data-i18n="navigator.calc_loan_amt">Loan Amount:</span> ₹<span id="amt-val" style="color: var(--ember-600); font-weight: 700;">1,00,000</span></label>
           <input type="range" id="amt-slider" min="10000" max="5000000" step="10000" value="100000" oninput="calcEMI()">
           <div class="hint-subtext">Adjust the slider or pick a scheme to autofill typical limits.</div>
         </div>
 
         <div class="field">
-          <label>Repayment Tenure: <span id="ten-val" style="color: var(--ember-600); font-weight: 700;">36</span> Months</label>
+          <label><span data-i18n="navigator.calc_tenure">Repayment Tenure:</span> <span id="ten-val" style="color: var(--ember-600); font-weight: 700;">36</span> Months</label>
           <input type="range" id="ten-slider" min="6" max="120" step="6" value="36" oninput="calcEMI()">
           <div class="hint-subtext" id="tenure-hint">Max tenure depends on scheme guidelines.</div>
         </div>
 
         <div class="field">
-          <label for="rate-input">Annual Interest Rate (% p.a.)</label>
+          <label for="rate-input" data-i18n="navigator.calc_rate">Annual Interest Rate (% p.a.)</label>
           <input type="number" id="rate-input" step="0.1" min="1" max="25" oninput="calcEMI()">
         </div>
 
@@ -246,24 +253,24 @@
 
       <div class="calc-display-card">
         <div>
-          <div class="sub-label">Estimated Monthly Installment (Post-Moratorium)</div>
+          <div class="sub-label" data-i18n="navigator.out_monthly_emi">Estimated Monthly Installment (Post-Moratorium)</div>
           <div class="emi-amount" id="emi-out">₹0</div>
         </div>
         <div>
           <div class="stat-row">
-            <span>Principal Sanction</span>
+            <span data-i18n="navigator.out_principal">Principal Sanction</span>
             <strong id="principal-out">₹0</strong>
           </div>
           <div class="stat-row">
-            <span>Total Interest Payable</span>
+            <span data-i18n="navigator.out_interest">Total Interest Payable</span>
             <strong id="interest-out">₹0</strong>
           </div>
           <div class="stat-row">
-            <span>Total Repayment (P + I)</span>
+            <span data-i18n="navigator.out_total">Total Repayment (P + I)</span>
             <strong id="total-out">₹0</strong>
           </div>
           <div class="stat-row">
-            <span>Moratorium Grace Period</span>
+            <span data-i18n="navigator.out_moratorium">Moratorium Grace Period</span>
             <strong id="mora-out">—</strong>
           </div>
         </div>
@@ -273,7 +280,7 @@
 
   <!-- ================= LOCATOR ================= -->
   <section class="tool-panel" id="locator">
-    <h3>Geo-Spatial Channel Partner Locator</h3>
+    <h3 data-i18n="navigator.locator_heading">Geo-Spatial Channel Partner Locator</h3>
     <p class="hint-subtext" style="margin-bottom: 12px;">
       Partners are ranked using the official SIH scoring formula: 
       <code>Score = 0.5 &times; (1 / (1 + Dist/50)) + 0.3 &times; (Fund/100) + 0.2 &times; (1 - NPA)</code>.
@@ -281,50 +288,50 @@
     </p>
 
     <div id="map"></div>
-    <div style="font-size: 0.86rem; color: var(--iron-600); margin: 8px 0;" id="locator-status">Initializing branch mapping…</div>
+    <div style="font-size: 0.86rem; color: var(--iron-600); margin: 8px 0;" id="locator-status" data-i18n="navigator.status_ranking">Initializing branch mapping…</div>
     <div id="partner-list"></div>
   </section>
 
   <!-- ================= QUICK FILTER ================= -->
   <section class="tool-panel" id="quick-finder">
-    <h3>Quick In-Browser Scheme Recommender</h3>
+    <h3 data-i18n="navigator.quick_heading">Quick In-Browser Scheme Recommender</h3>
     <p class="hint-subtext" style="margin-bottom: 20px;">For the comprehensive 5-point expert system, use the <a href="{{ url_for('index') }}" style="color: var(--ember-600); font-weight: 600;">Main Scheme Matcher</a>.</p>
 
     <div class="grid-2">
       <div class="field">
-        <label for="q-age">Applicant Age</label>
+        <label for="q-age" data-i18n="navigator.quick_age">Applicant Age</label>
         <input type="number" id="q-age" value="26" min="18" max="75">
       </div>
       <div class="field">
-        <label>Gender</label>
+        <label data-i18n="navigator.quick_gender">Gender</label>
         <div class="radio-row">
-          <label><input type="radio" name="q-gender" value="Male" checked> Male</label>
-          <label><input type="radio" name="q-gender" value="Female"> Female</label>
+          <label><input type="radio" name="q-gender" value="Male" checked> <span data-i18n="index.opt_male">Male</span></label>
+          <label><input type="radio" name="q-gender" value="Female"> <span data-i18n="index.opt_female">Female</span></label>
         </div>
       </div>
     </div>
 
     <div class="grid-2">
       <div class="field">
-        <label for="q-income">Annual Family Income (₹)</label>
+        <label for="q-income" data-i18n="navigator.quick_income">Annual Family Income (₹)</label>
         <input type="number" id="q-income" value="250000" step="25000">
       </div>
       <div class="field">
-        <label for="q-purpose">Primary Loan Purpose</label>
+        <label for="q-purpose" data-i18n="navigator.quick_purpose">Primary Loan Purpose</label>
         <select id="q-purpose">
-          <option value="micro">Small Business / Micro Trade</option>
-          <option value="term">Large Project / Manufacturing Unit</option>
-          <option value="education">Higher Education Course</option>
+          <option value="micro" data-i18n="navigator.quick_purpose_micro">Small Business / Micro Trade</option>
+          <option value="term" data-i18n="navigator.quick_purpose_term">Large Project / Manufacturing Unit</option>
+          <option value="education" data-i18n="navigator.quick_purpose_edu">Higher Education Course</option>
         </select>
       </div>
     </div>
 
     <div class="field">
-      <label for="q-amount">Required Loan Amount (₹)</label>
+      <label for="q-amount" data-i18n="navigator.quick_amount">Required Loan Amount (₹)</label>
       <input type="number" id="q-amount" value="100000" step="10000">
     </div>
 
-    <button class="btn-primary" onclick="runQuickFilter()">Find Matches In Catalog &rarr;</button>
+    <button class="btn-primary" onclick="runQuickFilter()" data-i18n="navigator.btn_quick_find">Find Matches In Catalog &rarr;</button>
 
     <div id="quick-results" style="margin-top: 24px;"></div>
   </section>
@@ -333,8 +340,8 @@
 
 <footer class="site-footer">
   <div class="footer-inner">
-    <p>Interest rates, moratorium periods, and channel partner rankings are indicative and derived from official RBI and NSFDC notifications.</p>
-    <p class="attribution">Developed for <strong>Smart India Hackathon (SIH)</strong> &middot; Team <strong>UDYAMSetu</strong></p>
+    <p data-i18n="footer.disclaimer_navigator">Interest rates, moratorium periods, and channel partner rankings are indicative and derived from official RBI and NSFDC notifications.</p>
+    <p class="attribution" data-i18n-html="footer.attribution">Developed for <strong>Smart India Hackathon (SIH)</strong> &middot; Team <strong>UDYAMSetu</strong></p>
   </div>
 </footer>
 
@@ -497,11 +504,12 @@ function renderPartners() {
 
   const list = document.getElementById('partner-list');
   list.innerHTML = '';
+  const dict = I18N_DICTIONARY[currentLang] || I18N_DICTIONARY['en'];
 
   ranked.forEach((p, idx) => {
     const tier = p.score > 0.65 ? 'high' : (p.score > 0.45 ? 'med' : 'low');
     const color = tier === 'high' ? '#276749' : (tier === 'med' ? '#DD6B20' : '#C53030');
-    const tierLabel = tier === 'high' ? 'Recommended Branch' : (tier === 'med' ? 'Usable' : 'Low Headroom');
+    const tierLabel = tier === 'high' ? dict['navigator.rec_branch'] : (tier === 'med' ? dict['navigator.usable_branch'] : dict['navigator.low_headroom']);
 
     L.circleMarker([p.lat, p.lng], { radius: 9, color: color, fillColor: color, fillOpacity: 0.85 })
       .addTo(map)
@@ -528,7 +536,7 @@ function renderPartners() {
     list.appendChild(card);
   });
 
-  document.getElementById('locator-status').textContent = 'Showing partners ranked by weighted formula: distance + fund liquidity + NPA security.';
+  document.getElementById('locator-status').textContent = dict['navigator.status_ranking'];
 }
 
 function tryGeolocate() {
@@ -650,5 +658,6 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+<script src="{{ url_for('static', filename='i18n.js') }}"></script>
 </body>
 </html>

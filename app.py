@@ -116,6 +116,15 @@ def serve_root_css():
     return send_from_directory(BASE_DIR, "style.css", mimetype="text/css")
 
 
+@app.route("/i18n.js", methods=["GET"])
+def serve_root_i18n():
+    """Fallback route to ensure i18n.js serves properly under any link reference."""
+    static_dir = os.path.join(BASE_DIR, "static")
+    if os.path.exists(os.path.join(static_dir, "i18n.js")):
+        return send_from_directory(static_dir, "i18n.js", mimetype="application/javascript")
+    return send_from_directory(BASE_DIR, "i18n.js", mimetype="application/javascript")
+
+
 if __name__ == "__main__":
     print(" * Starting UDYAMSetu Concessional Finance Server...")
     print(f" * Loaded {len(SCHEMES)} government schemes from schemes.json")

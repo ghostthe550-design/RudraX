@@ -14,15 +14,22 @@
       <div class="brand-identity">
         <div class="brand-shield">US</div>
         <div class="brand-text">
-          <h1>UDYAMSetu</h1>
-          <p>Concessional Finance Navigator &amp; Eligibility Shield</p>
+          <h1 data-i18n="brand.title">UDYAMSetu</h1>
+          <p data-i18n="brand.tagline">Concessional Finance Navigator &amp; Eligibility Shield</p>
         </div>
+      </div>
+
+      <div class="lang-switcher" id="lang-switcher">
+        <span class="lang-icon" aria-hidden="true">🌐</span>
+        <button type="button" class="lang-btn active" data-lang="en" onclick="setLanguage('en')">English</button>
+        <span class="lang-divider">|</span>
+        <button type="button" class="lang-btn" data-lang="hi" onclick="setLanguage('hi')">हिन्दी</button>
       </div>
     </div>
     <nav class="site-nav">
-      <a href="{{ url_for('index') }}" class="nav-link">1. Scheme Matcher</a>
-      <a href="{{ url_for('compare') }}" class="nav-link">2. Compare Lenders</a>
-      <a href="{{ url_for('navigator') }}" class="nav-link">3. EMI Calculator &amp; Partner Map</a>
+      <a href="{{ url_for('index') }}" class="nav-link" data-i18n="nav.matcher">1. Scheme Matcher</a>
+      <a href="{{ url_for('compare') }}" class="nav-link" data-i18n="nav.compare">2. Compare Lenders</a>
+      <a href="{{ url_for('navigator') }}" class="nav-link" data-i18n="nav.navigator">3. EMI Calculator &amp; Partner Map</a>
     </nav>
   </div>
 </header>
@@ -30,14 +37,14 @@
 <main>
 
   <div class="page-title-section">
-    <h2>Your Evaluated Scheme Compatibility</h2>
-    <p>Based on your profile, here is the transparent breakdown of which central and state concessional loan schemes match your requirements, ranked by compatibility.</p>
+    <h2 data-i18n="results.hero_title">Your Evaluated Scheme Compatibility</h2>
+    <p data-i18n="results.hero_subtitle">Based on your profile, here is the transparent breakdown of which central and state concessional loan schemes match your requirements, ranked by compatibility.</p>
   </div>
 
   {% if user %}
   <div class="results-summary-card">
     <div>
-      <strong style="display:block; font-size: 0.88rem; color: var(--iron-500); text-transform: uppercase;">Evaluated Profile:</strong>
+      <strong style="display:block; font-size: 0.88rem; color: var(--iron-500); text-transform: uppercase;" data-i18n="results.eval_profile">Evaluated Profile:</strong>
       <div class="profile-pills" style="margin-top: 6px;">
         <span class="profile-pill">Age: {{ user.age }} yrs</span>
         <span class="profile-pill">Gender: {{ user.gender }}</span>
@@ -47,7 +54,7 @@
         <span class="profile-pill">Credit Default: {{ 'Yes' if user.has_loan_default else 'None (Clean)' }}</span>
       </div>
     </div>
-    <a href="{{ url_for('index') }}" class="btn-outline btn-sm">Edit Profile</a>
+    <a href="{{ url_for('index') }}" class="btn-outline btn-sm" data-i18n="results.btn_edit">Edit Profile</a>
   </div>
   {% endif %}
 
@@ -67,20 +74,20 @@
         <div class="score-bar-fill" style="width: {{ r.match_score }}%;"></div>
       </div>
       <div class="score-meta">
-        <span>Eligibility Compatibility</span>
+        <span data-i18n="results.match_compat">Eligibility Compatibility</span>
         <span>{{ r.match_score }}% Match</span>
       </div>
     </div>
 
     <div class="scheme-metrics-strip">
-      <div class="metric-item">Max Loan: <strong>₹{{ '{:,}'.format(r.max_loan_amount) }}</strong></div>
-      <div class="metric-item">Interest Rate: <strong>{{ r.interest_rate_range }}</strong></div>
-      <div class="metric-item">Scheme ID: <strong>{{ r.scheme_id }}</strong></div>
+      <div class="metric-item"><span data-i18n="results.max_loan">Max Loan:</span> <strong>₹{{ '{:,}'.format(r.max_loan_amount) }}</strong></div>
+      <div class="metric-item"><span data-i18n="results.interest_rate">Interest Rate:</span> <strong>{{ r.interest_rate_range }}</strong></div>
+      <div class="metric-item"><span data-i18n="results.scheme_id">Scheme ID:</span> <strong>{{ r.scheme_id }}</strong></div>
     </div>
 
     {% if r.reasons_pass %}
     <div class="reasons">
-      <h3>Why You Qualify</h3>
+      <h3 data-i18n="results.why_qualify">Why You Qualify</h3>
       <ul class="reasons-pass">
         {% for reason in r.reasons_pass %}
         <li>{{ reason }}</li>
@@ -91,7 +98,7 @@
 
     {% if r.reasons_fail %}
     <div class="reasons">
-      <h3>Areas of Non-Compliance / Gaps</h3>
+      <h3 data-i18n="results.areas_gap">Areas of Non-Compliance / Gaps</h3>
       <ul class="reasons-fail">
         {% for reason in r.reasons_fail %}
         <li>{{ reason }}</li>
@@ -102,7 +109,7 @@
 
     {% if r.application_steps %}
     <div class="steps">
-      <h3>Application &amp; Sanction Roadmap</h3>
+      <h3 data-i18n="results.roadmap">Application &amp; Sanction Roadmap</h3>
       <ol>
         {% for step in r.application_steps %}
         <li>{{ step }}</li>
@@ -113,11 +120,11 @@
 
     {% if r.contact_and_apply %}
     <div class="contact-box">
-      <h3>Designated Contact &amp; Application Channels</h3>
+      <h3 data-i18n="results.contacts">Designated Contact &amp; Application Channels</h3>
       <div class="contact-grid">
         {% if r.contact_and_apply.portal_url %}
         <div class="contact-item">
-          <strong>Official Portal</strong>
+          <strong data-i18n="results.portal">Official Portal</strong>
           <a href="https://{{ r.contact_and_apply.portal_url }}" target="_blank" rel="noopener noreferrer">
             {{ r.contact_and_apply.portal_url }} &UpperRightArrow;
           </a>
@@ -126,21 +133,21 @@
 
         {% if r.contact_and_apply.toll_free_helpline %}
         <div class="contact-item">
-          <strong>Toll-Free Helpline</strong>
+          <strong data-i18n="results.helpline">Toll-Free Helpline</strong>
           <a href="tel:{{ r.contact_and_apply.toll_free_helpline }}">{{ r.contact_and_apply.toll_free_helpline }}</a>
         </div>
         {% endif %}
 
         {% if r.contact_and_apply.support_email %}
         <div class="contact-item">
-          <strong>Official Support Email</strong>
+          <strong data-i18n="results.email">Official Support Email</strong>
           <a href="mailto:{{ r.contact_and_apply.support_email }}">{{ r.contact_and_apply.support_email }}</a>
         </div>
         {% endif %}
 
         {% if r.contact_and_apply.designated_physical_office %}
         <div class="contact-item">
-          <strong>Physical Office / Desk</strong>
+          <strong data-i18n="results.office">Physical Office / Desk</strong>
           <span>{{ r.contact_and_apply.designated_physical_office }}</span>
         </div>
         {% endif %}
@@ -149,10 +156,10 @@
     {% endif %}
 
     <div class="card-actions">
-      <a href="{{ url_for('navigator') }}?scheme={{ r.scheme_id }}&amount={{ r.max_loan_amount }}" class="btn-primary btn-sm">
+      <a href="{{ url_for('navigator') }}?scheme={{ r.scheme_id }}&amount={{ r.max_loan_amount }}" class="btn-primary btn-sm" data-i18n="results.btn_calc">
         Calculate EMI for this Scheme &rarr;
       </a>
-      <a href="{{ url_for('navigator') }}#locator" class="btn-outline btn-sm">
+      <a href="{{ url_for('navigator') }}#locator" class="btn-outline btn-sm" data-i18n="results.btn_locate">
         Locate Nearby Disbursing Branch &rarr;
       </a>
     </div>
@@ -161,18 +168,19 @@
   {% endfor %}
 
   <div style="display: flex; gap: 14px; flex-wrap: wrap; margin-top: 30px;">
-    <a href="{{ url_for('index') }}" class="btn-secondary">Check Another Profile</a>
-    <a href="{{ url_for('compare') }}" class="btn-outline">Compare All Lenders &amp; Schemes &rarr;</a>
+    <a href="{{ url_for('index') }}" class="btn-secondary" data-i18n="results.btn_check_another">Check Another Profile</a>
+    <a href="{{ url_for('compare') }}" class="btn-outline" data-i18n="results.btn_compare_all">Compare All Lenders &amp; Schemes &rarr;</a>
   </div>
 
 </main>
 
 <footer class="site-footer">
   <div class="footer-inner">
-    <p>This match report is generated deterministically from government scheme rule matrices. Final loan appraisal is conducted by the disbursing financial institution.</p>
-    <p class="attribution">Developed for <strong>Smart India Hackathon (SIH)</strong> &middot; Team <strong>UDYAMSetu</strong></p>
+    <p data-i18n="footer.disclaimer_results">This match report is generated deterministically from government scheme rule matrices. Final loan appraisal is conducted by the disbursing financial institution.</p>
+    <p class="attribution" data-i18n-html="footer.attribution">Developed for <strong>Smart India Hackathon (SIH)</strong> &middot; Team <strong>UDYAMSetu</strong></p>
   </div>
 </footer>
 
+<script src="{{ url_for('static', filename='i18n.js') }}"></script>
 </body>
 </html>

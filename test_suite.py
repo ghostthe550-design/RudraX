@@ -60,4 +60,12 @@ r2 = client.get('/style.css')
 assert r2.status_code == 200, f'GET /style.css fallback failed: {r2.status_code}'
 print('[PASS] Static CSS routes: 200 OK for both /static/style.css and /style.css')
 
+# 9. GET /static/i18n.js & /i18n.js
+ri1 = client.get('/static/i18n.js')
+assert ri1.status_code == 200, f'GET /static/i18n.js failed: {ri1.status_code}'
+ri2 = client.get('/i18n.js')
+assert ri2.status_code == 200, f'GET /i18n.js fallback failed: {ri2.status_code}'
+assert b'I18N_DICTIONARY' in ri1.data, 'I18N dictionary missing in i18n.js'
+print('[PASS] Static i18n JS routes: 200 OK for both /static/i18n.js and /i18n.js')
+
 print('\n*** ALL AUTOMATED BACKEND & INTEGRATION TESTS PASSED! ***')

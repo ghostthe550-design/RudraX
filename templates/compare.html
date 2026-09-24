@@ -57,15 +57,22 @@
       <div class="brand-identity">
         <div class="brand-shield">US</div>
         <div class="brand-text">
-          <h1>UDYAMSetu</h1>
-          <p>Concessional Finance Navigator &amp; Eligibility Shield</p>
+          <h1 data-i18n="brand.title">UDYAMSetu</h1>
+          <p data-i18n="brand.tagline">Concessional Finance Navigator &amp; Eligibility Shield</p>
         </div>
+      </div>
+
+      <div class="lang-switcher" id="lang-switcher">
+        <span class="lang-icon" aria-hidden="true">🌐</span>
+        <button type="button" class="lang-btn active" data-lang="en" onclick="setLanguage('en')">English</button>
+        <span class="lang-divider">|</span>
+        <button type="button" class="lang-btn" data-lang="hi" onclick="setLanguage('hi')">हिन्दी</button>
       </div>
     </div>
     <nav class="site-nav">
-      <a href="{{ url_for('index') }}" class="nav-link">1. Scheme Matcher</a>
-      <a href="{{ url_for('compare') }}" class="nav-link active">2. Compare Lenders</a>
-      <a href="{{ url_for('navigator') }}" class="nav-link">3. EMI Calculator &amp; Partner Map</a>
+      <a href="{{ url_for('index') }}" class="nav-link" data-i18n="nav.matcher">1. Scheme Matcher</a>
+      <a href="{{ url_for('compare') }}" class="nav-link active" data-i18n="nav.compare">2. Compare Lenders</a>
+      <a href="{{ url_for('navigator') }}" class="nav-link" data-i18n="nav.navigator">3. EMI Calculator &amp; Partner Map</a>
     </nav>
   </div>
 </header>
@@ -73,30 +80,30 @@
 <main>
 
   <div class="page-title-section">
-    <h2>Multi-Channel Lender &amp; Scheme Comparison</h2>
-    <p>Compare borrowing options across 3 distinct routes: Central Concessional Schemes, Disbursing Partner Banks &amp; NBFCs, and Block-Level Direct Schemes. Review interest rates, disbursal turnaround times, and moratorium windows.</p>
+    <h2 data-i18n="compare.hero_title">Multi-Channel Lender &amp; Scheme Comparison</h2>
+    <p data-i18n="compare.hero_subtitle">Compare borrowing options across 3 distinct routes: Central Concessional Schemes, Disbursing Partner Banks &amp; NBFCs, and Block-Level Direct Schemes. Review interest rates, disbursal turnaround times, and moratorium windows.</p>
   </div>
 
   <div class="filter-bar">
     <div class="filter-group">
-      <label for="sort-select">Sort By:</label>
+      <label for="sort-select" data-i18n="compare.sort_label">Sort By:</label>
       <select id="sort-select" onchange="applyFilters()">
-        <option value="rate_asc">Lowest Interest Rate (Default)</option>
-        <option value="safety_speed">Fastest Disbursal &amp; Lowest NPA Risk</option>
-        <option value="amount_desc">Highest Max Loan Amount</option>
-        <option value="moratorium_desc">Longest Moratorium Grace</option>
+        <option value="rate_asc" data-i18n="compare.sort_rate_asc">Lowest Interest Rate (Default)</option>
+        <option value="safety_speed" data-i18n="compare.sort_safety_speed">Fastest Disbursal &amp; Lowest NPA Risk</option>
+        <option value="amount_desc" data-i18n="compare.sort_amount_desc">Highest Max Loan Amount</option>
+        <option value="moratorium_desc" data-i18n="compare.sort_moratorium_desc">Longest Moratorium Grace</option>
       </select>
     </div>
 
     <div class="filter-group">
-      <label for="type-filter">Channel Route:</label>
+      <label for="type-filter" data-i18n="compare.filter_label">Channel Route:</label>
       <select id="type-filter" onchange="applyFilters()">
-        <option value="all">All Lending Channels (8)</option>
-        <option value="Govt Scheme">Government Concessional</option>
-        <option value="PSB">Public Sector Bank (PSB)</option>
-        <option value="RRB">Regional Rural Bank (RRB)</option>
-        <option value="NBFC-MFI">NBFC-MFI Microfinance</option>
-        <option value="Block Scheme">Block-Level Direct Desk</option>
+        <option value="all" data-i18n="compare.opt_all_channels">All Lending Channels (8)</option>
+        <option value="Govt Scheme" data-i18n="compare.opt_govt">Government Concessional</option>
+        <option value="PSB" data-i18n="compare.opt_psb">Public Sector Bank (PSB)</option>
+        <option value="RRB" data-i18n="compare.opt_rrb">Regional Rural Bank (RRB)</option>
+        <option value="NBFC-MFI" data-i18n="compare.opt_nbfc">NBFC-MFI Microfinance</option>
+        <option value="Block Scheme" data-i18n="compare.opt_block">Block-Level Direct Desk</option>
       </select>
     </div>
   </div>
@@ -105,13 +112,13 @@
     <table class="compare-table">
       <thead>
         <tr>
-          <th>Lender / Scheme</th>
-          <th>Channel Type</th>
-          <th>Interest Rate</th>
-          <th>Max Loan</th>
-          <th>Moratorium</th>
-          <th>Avg. Disbursal</th>
-          <th>Actions</th>
+          <th data-i18n="compare.th_lender">Lender / Scheme</th>
+          <th data-i18n="compare.th_type">Channel Type</th>
+          <th data-i18n="compare.th_rate">Interest Rate</th>
+          <th data-i18n="compare.th_max_loan">Max Loan</th>
+          <th data-i18n="compare.th_moratorium">Moratorium</th>
+          <th data-i18n="compare.th_disbursal">Avg. Disbursal</th>
+          <th data-i18n="compare.th_actions">Actions</th>
         </tr>
       </thead>
       <tbody id="lenders-tbody"></tbody>
@@ -119,16 +126,16 @@
   </div>
 
   <div style="margin-top: 30px; display: flex; gap: 14px; flex-wrap: wrap;">
-    <a href="{{ url_for('index') }}" class="btn-primary">Check Exact Eligibility Match &rarr;</a>
-    <a href="{{ url_for('navigator') }}" class="btn-secondary">Open Interactive EMI Simulator</a>
+    <a href="{{ url_for('index') }}" class="btn-primary" data-i18n="compare.btn_check_exact">Check Exact Eligibility Match &rarr;</a>
+    <a href="{{ url_for('navigator') }}" class="btn-secondary" data-i18n="compare.btn_open_calc">Open Interactive EMI Simulator</a>
   </div>
 
 </main>
 
 <footer class="site-footer">
   <div class="footer-inner">
-    <p>All loan figures, processing timelines, and interest rates are benchmarked against official circulars and RBI priority sector lending norms.</p>
-    <p class="attribution">Developed for <strong>Smart India Hackathon (SIH)</strong> &middot; Team <strong>UDYAMSetu</strong></p>
+    <p data-i18n="footer.disclaimer_compare">All loan figures, processing timelines, and interest rates are benchmarked against official circulars and RBI priority sector lending norms.</p>
+    <p class="attribution" data-i18n-html="footer.attribution">Developed for <strong>Smart India Hackathon (SIH)</strong> &middot; Team <strong>UDYAMSetu</strong></p>
   </div>
 </footer>
 
@@ -271,13 +278,15 @@ function applyFilters() {
   });
 
   const tbody = document.getElementById('lenders-tbody');
+  const dict = I18N_DICTIONARY[currentLang] || I18N_DICTIONARY['en'];
+
   tbody.innerHTML = filtered.map(l => {
     const isBestRate = l.interest_rate === minRate;
     const isFastestSafest = l.name === safestLender;
 
     let badges = '';
-    if (isBestRate) badges += '<span class="lender-badge badge-best-rate">Best Rate</span>';
-    if (isFastestSafest) badges += '<span class="lender-badge badge-fastest">Fastest &amp; Safest</span>';
+    if (isBestRate) badges += `<span class="lender-badge badge-best-rate">${dict['compare.badge_best_rate']}</span>`;
+    if (isFastestSafest) badges += `<span class="lender-badge badge-fastest">${dict['compare.badge_fastest']}</span>`;
 
     return `
       <tr>
@@ -290,11 +299,11 @@ function applyFilters() {
         <td><span class="type-pill ${getTypeClass(l.type)}">${l.type}</span></td>
         <td><strong style="color: var(--ember-600); font-size: 1rem;">${l.interest_rate}% p.a.</strong></td>
         <td>₹${l.max_loan.toLocaleString('en-IN')}</td>
-        <td>${l.moratorium_months} Months</td>
-        <td>${l.processing_days} Business Days</td>
+        <td>${l.moratorium_months} ${dict['compare.months']}</td>
+        <td>${l.processing_days} ${dict['compare.days']}</td>
         <td>
           <a href="/navigator?scheme=${l.scheme_id}&amount=${l.max_loan}" class="btn-outline btn-sm" style="white-space: nowrap;">
-            Simulate EMI &rarr;
+            ${dict['compare.simulate_emi']}
           </a>
         </td>
       </tr>
@@ -305,5 +314,6 @@ function applyFilters() {
 window.addEventListener('DOMContentLoaded', applyFilters);
 </script>
 
+<script src="{{ url_for('static', filename='i18n.js') }}"></script>
 </body>
 </html>
