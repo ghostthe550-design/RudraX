@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RudraX — Compare Lenders &amp; Concessional Schemes</title>
+  <title>UDYAMSetu — Compare Lenders &amp; Concessional Schemes</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <style>
     .filter-bar {
@@ -55,9 +55,9 @@
   <div class="header-inner">
     <div class="brand-row">
       <div class="brand-identity">
-        <div class="brand-shield">RX</div>
+        <div class="brand-shield">US</div>
         <div class="brand-text">
-          <h1>RudraX</h1>
+          <h1>UDYAMSetu</h1>
           <p>Concessional Finance Navigator &amp; Eligibility Shield</p>
         </div>
       </div>
@@ -91,7 +91,7 @@
     <div class="filter-group">
       <label for="type-filter">Channel Route:</label>
       <select id="type-filter" onchange="applyFilters()">
-        <option value="all">All Lending Channels (7)</option>
+        <option value="all">All Lending Channels (8)</option>
         <option value="Govt Scheme">Government Concessional</option>
         <option value="PSB">Public Sector Bank (PSB)</option>
         <option value="RRB">Regional Rural Bank (RRB)</option>
@@ -128,7 +128,7 @@
 <footer class="site-footer">
   <div class="footer-inner">
     <p>All loan figures, processing timelines, and interest rates are benchmarked against official circulars and RBI priority sector lending norms.</p>
-    <p class="attribution">Developed for <strong>Smart India Hackathon (SIH)</strong> &middot; Team <strong>RudraX</strong></p>
+    <p class="attribution">Developed for <strong>Smart India Hackathon (SIH)</strong> &middot; Team <strong>UDYAMSetu</strong></p>
   </div>
 </footer>
 
@@ -137,6 +137,17 @@
    LENDER SEED DATA (Concessional, Commercial, & Block Channels)
    =============================================================== */
 const LENDERS = [
+  {
+    name: 'Bihar Student Credit Card (BSCC / DRCC)',
+    type: 'Govt Scheme',
+    interest_rate: 4.0,
+    max_loan: 400000,
+    moratorium_months: 12,
+    processing_days: 14,
+    fund_availability: 95,
+    npa_ratio: 0.02,
+    scheme_id: 'BSCC08'
+  },
   {
     name: 'NSFDC Micro Finance Facility',
     type: 'Govt Scheme',

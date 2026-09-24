@@ -1,8 +1,8 @@
-# RudraX — Concessional Finance Navigator & Eligibility Shield
+# UDYAMSetu — Concessional Finance Navigator & Eligibility Shield
 
-> Smart India Hackathon (SIH) — Team RudraX
+> Smart India Hackathon (SIH) — Team UDYAMSetu
 
-A deterministic, fully explainable government concessional loan scheme eligibility platform built for SC/ST beneficiaries and channel partners.
+A deterministic, fully explainable government concessional loan scheme eligibility platform built for SC/ST and general beneficiaries and channel partners.
 
 ---
 
@@ -10,7 +10,7 @@ A deterministic, fully explainable government concessional loan scheme eligibili
 
 **3 core tools in one platform:**
 
-1. **Scheme Matcher** — Rule-based expert system that evaluates your profile (age, gender, caste, education, disability, credit history) against 7+ government concessional loan schemes and returns a compatibility score with plain-language reasons for every pass/fail.
+1. **Scheme Matcher** — Rule-based expert system that evaluates your profile (age, gender, caste, education, disability, credit history) against 8+ government concessional loan schemes and returns a compatibility score with plain-language reasons for every pass/fail.
 
 2. **Compare Lenders** — Side-by-side comparison table covering all 3 funding routes: Central Govt Concessional Schemes, Channel Partner Banks/NBFCs/RRBs, and Block-Level Direct Desks. Sortable by interest rate, disbursal speed, and NPA safety.
 
@@ -29,6 +29,7 @@ A deterministic, fully explainable government concessional loan scheme eligibili
 | NSFDC Term Loan Scheme | SC Concessional | ₹50,00,000 | 7.5% |
 | NSFDC Educational Loan Scheme | SC Concessional | ₹20,00,000 | 4.0% |
 | Mahila Micro Credit Scheme (MMCS) | SC Women | ₹1,40,000 | 4.0% |
+| Bihar Student Credit Card Scheme (BSCC) | Higher Education | ₹4,00,000 | 4.0% (1.0% Women/PwD) |
 
 ---
 
@@ -46,8 +47,8 @@ A deterministic, fully explainable government concessional loan scheme eligibili
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/ghostthe550-design/rudrax.git
-cd rudrax
+git clone https://github.com/ghostthe550-design/udyamsetu.git
+cd udyamsetu
 
 # 2. Install dependencies
 pip install -r requirements.txt
@@ -64,7 +65,7 @@ python app.py
 ## Project Structure
 
 ```
-rudrax/
+udyamsetu/
 ├── app.py              # Flask backend — routes, validation, engine call
 ├── engine.py           # Deterministic eligibility rules engine (no ML)
 ├── schemes.json        # Government scheme database (loan rules & contacts)
@@ -122,4 +123,4 @@ Partners are ranked by this composite score, ensuring beneficiaries are routed t
 
 ## License
 
-MIT License — Built for Smart India Hackathon (SIH), Team RudraX.
+MIT License — Built for Smart India Hackathon (SIH), Team UDYAMSetu.

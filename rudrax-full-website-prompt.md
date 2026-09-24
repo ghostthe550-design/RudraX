@@ -1,10 +1,10 @@
-# RudraX — Build Prompt for Full Working Website (v2)
+# UDYAMSetu — Build Prompt for Full Working Website (v2)
 
 Copy everything below the line into your AI coding tool (Claude Code, Cursor, etc.) in one go. This supersedes any earlier prototype — this time build a complete, judge-ready website with multiple pages, not a single demo screen.
 
 ---
 
-You are building a full working website for a Smart India Hackathon (SIH) problem statement, for team **RudraX**. This must be a polished, deployable website — not pseudocode, not a single demo screen. Deliver actual runnable files with a proper multi-page structure and navigation.
+You are building a full working website for a Smart India Hackathon (SIH) problem statement, for team **UDYAMSetu**. This must be a polished, deployable website — not pseudocode, not a single demo screen. Deliver actual runnable files with a proper multi-page structure and navigation.
 
 ## 1. Problem Context
 
@@ -26,7 +26,7 @@ Government gives concessional loans to Scheduled Caste (SC) beneficiaries (famil
 4. **EMI Calculator** — scheme/lender-aware: auto-fills interest rate + moratorium from whichever option the user picked on the Compare page, sliders for amount/tenure, shows EMI, total interest, total payment
 5. **Nearest Partner / Locator** — map + ranked list of nearby partners (banks, SCAs, NBFC-MFIs, block offices), each list card and map popup must show **full address and a contact phone number**, ranked by: `0.5 × (1/(1+distance_km/50)) + 0.3 × (fund_availability/100) + 0.2 × (1 − npa_ratio)`
 
-Shared header/nav across all pages, shared footer with a short disclaimer ("rates shown are indicative, confirm with the lender") and RudraX credit line.
+Shared header/nav across all pages, shared footer with a short disclaimer ("rates shown are indicative, confirm with the lender") and UDYAMSetu credit line.
 
 ## 4. Data to Seed (extend all of this — do not leave it thin)
 
@@ -37,6 +37,7 @@ Shared header/nav across all pages, shared footer with a short disclaimer ("rate
 | Term Loan Scheme | larger project/manufacturing | ₹5,00,000 | ₹50,00,000 | 90% | 7.5% | 6 months |
 | Educational Loan Scheme | higher education | ₹5,00,000 | ₹20,00,000 | 90% | 4.0% | 12 months |
 | Mahila Micro Credit Scheme | small business/trade (women ≤35) | ₹5,00,000 | ₹1,40,000 | 95% | 4.0% | 3 months |
+| Bihar Student Credit Card (BSCC) | higher education | None | ₹4,00,000 | 100% | 4.0% (1% Women/PwD) | 12 months |
 
 ### B. Bank / NBFC-MFI Lender Records (for the Compare page — seed at least 6-8 realistic entries)
 Each record needs: `name, type (PSB/RRB/NBFC-MFI/Block Scheme), interest_rate, max_loan, processing_days, address, phone, lat, lng, fund_availability, npa_ratio`. Mix in a couple of **regular bank loan products** (non-concessional, higher rate, for users who don't qualify for the SC scheme) so the comparison is genuinely useful, not just a duplicate of the government scheme list. Also seed 1-2 **block-level scheme** entries (district/block office administered, lower documentation, smaller ticket size) to represent the third route explicitly.
@@ -62,9 +63,9 @@ Given the user's purpose + amount + income from the recommender step, filter `le
 - Alternate sort toggle: descending computed score `0.6*(1-npa_ratio) + 0.4*(1/(1+processing_days/10))` (fastest + safest)
 - Flag the top interest-rate result "Best rate" and the top alternate-sort result "Fastest & safest" — a lender can hold both badges
 
-## 6. Brand & Design — RudraX theme
+## 6. Brand & Design — UDYAMSetu theme
 
-"Rudra" = strength, protection, decisive force. Design should feel authoritative and protective of people's money — not a soft generic SaaS site. Avoid default AI-generated looks (no cream+terracotta, no dark+neon, no identical rounded cards with soft grey shadows everywhere).
+"UDYAMSetu" = Enterprise bridge & financial empowerment. Design should feel authoritative and protective of people's money — not a soft generic SaaS site. Avoid default AI-generated looks (no cream+terracotta, no dark+neon, no identical rounded cards with soft grey shadows everywhere).
 
 - Palette: deep charcoal/iron-grey base, bold copper-rust/ember-orange accent, warm off-white for content areas — pick your own exact hex values and justify each in one line
 - Typography: one strong serif/slab-serif for headings, clean grotesque sans for body/data, sentence case only, no all-caps eyebrows

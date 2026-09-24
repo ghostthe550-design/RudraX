@@ -1,10 +1,10 @@
-# RudraX — Build Prompt for Full Working Prototype
+# UDYAMSetu — Build Prompt for Full Working Prototype
 
 Copy everything below the line into your AI coding tool (Claude Code, Cursor, etc.) in one go.
 
 ---
 
-You are building a full working prototype for a Smart India Hackathon (SIH) problem statement, for a team called **RudraX**. Build production-quality demo code, not pseudocode. Deliver actual runnable files.
+You are building a full working prototype for a Smart India Hackathon (SIH) problem statement, for a team called **UDYAMSetu**. Build production-quality demo code, not pseudocode. Deliver actual runnable files.
 
 ## 1. Problem Context
 
@@ -42,13 +42,13 @@ score = 0.5 × (1 / (1 + distance_km/50)) + 0.3 × (fund_availability/100) + 0.2
 
 Rank partners by this score, not raw distance. Color-code map markers and list items by score tier (high/medium/low). Use `navigator.geolocation` for the user's position with a sensible fallback if permission is denied. Include the Supabase `partners` table schema (name, type, lat, lng, fund_availability, npa_ratio) as a SQL comment, plus 6–8 bundled mock partner records so the map is populated even without live data.
 
-## 5. Brand & Design Direction — theme around "RudraX"
+## 5. Brand & Design Direction — theme around "UDYAMSetu"
 
-"Rudra" evokes strength, protection, and decisive force (the fierce, protective aspect of Shiva) — translate that into a platform that feels **authoritative, protective, and no-nonsense** about people's money, not a generic soft SaaS look. Avoid cliché AI-generated defaults (no cream-background/terracotta-accent look, no dark-mode-neon-green look, no generic rounded SaaS cards everywhere).
+"UDYAMSetu" represents the bridge (Setu) for enterprise and empowerment (Udyam) — translate that into a platform that feels **authoritative, protective, and no-nonsense** about people's money, not a generic soft SaaS look. Avoid cliché AI-generated defaults (no cream-background/terracotta-accent look, no dark-mode-neon-green look, no generic rounded SaaS cards everywhere).
 
 - **Palette**: anchor on a deep charcoal/iron-grey and a bold copper-rust or ember-orange accent (protective, forged-metal feel) with a warm off-white background for readability — pick exact hex values yourself and justify them in one line each.
 - **Typography**: one strong serif or slab-serif for headings (authority, permanence) paired with a clean grotesque sans for body/data. Sentence case only — no all-caps labels, no tracked-out eyebrows.
-- **Layout**: the app name "RudraX" and its tagline should anchor the header with intent — this is a shield/checkpoint for people's money, not a friendly assistant. Keep the 3 features as a clear step flow (find scheme → calculate EMI → locate partner), not scattered cards.
+- **Layout**: the app name "UDYAMSetu" and its tagline should anchor the header with intent — this is a shield/checkpoint for people's money, not a friendly assistant. Keep the 3 features as a clear step flow (find scheme → calculate EMI → locate partner), not scattered cards.
 - Responsive down to mobile, visible focus states, no unnecessary animation.
 
 ## 6. Deliverable Format

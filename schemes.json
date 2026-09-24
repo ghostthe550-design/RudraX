@@ -278,6 +278,47 @@
         "Step 4: Concessional funds disbursed at ultra-low 4% annual interest",
         "Step 5: Enjoy 3-month moratorium and easy 36 to 60-month monthly repayment"
       ]
+    },
+    {
+      "scheme_id": "BSCC08",
+      "scheme_name": "Bihar Student Credit Card Scheme (BSCC)",
+      "issuing_authority": "Bihar State Higher Education Council / MNSSBY, Govt. of Bihar",
+      "loan_category": "State Concessional Higher Education Loan",
+      "max_loan_amount": 400000,
+      "min_loan_amount": 10000,
+      "interest_rate": 4.0,
+      "interest_rate_range": "4.0% p.a. (1.0% for Women, Divyang & Transgender)",
+      "moratorium_months": 12,
+      "funding_pct": 100,
+      "purpose": "education",
+      "eligibility_rules": {
+        "min_age": 18,
+        "max_age": 35,
+        "allowed_genders": ["Male", "Female", "Other"],
+        "allowed_castes": ["General", "SC", "ST", "OBC"],
+        "min_education_level": 4,
+        "allow_defaulters": false,
+        "pwd_eligible": true,
+        "special_conditions": [
+          "Resident of Bihar with 12th / Intermediate qualification from recognized board",
+          "Secured admission in recognized higher education courses (General, Technical, or Professional)",
+          "Interest rate is 4% for male applicants, and 1% subsidized rate for female, Divyang (PwD), and transgender applicants",
+          "Moratorium covers the entire course duration + 1 year (or 6 months after securing employment)"
+        ]
+      },
+      "contact_and_apply": {
+        "portal_url": "7nishchay-yuvaupmission.bihar.gov.in",
+        "toll_free_helpline": "1800-3456-444",
+        "support_email": "support.mnssby@bihar.gov.in",
+        "designated_physical_office": "District Registration and Counseling Centre (DRCC) in each district of Bihar"
+      },
+      "application_steps": [
+        "Step 1: Register on the MNSSBY portal (7nishchay-yuvaupmission.bihar.gov.in) with Aadhaar and mobile number",
+        "Step 2: Fill out the Bihar Student Credit Card (BSCC) application with educational details & college fee structure",
+        "Step 3: Book an appointment and visit your local District Registration and Counseling Centre (DRCC) with original documents",
+        "Step 4: DRCC team verifies documents and forwards application to the Bihar State Educational Finance Corporation",
+        "Step 5: Sanction letter and Student Credit Card issued with loan disbursed directly to the academic institution"
+      ]
     }
   ]
 }

@@ -1,6 +1,6 @@
 """
 app.py
-RudraX — Concessional Finance Navigator & Eligibility Shield
+UDYAMSetu — Concessional Finance Navigator & Eligibility Shield
 Flask Web Backend
 
 Serves the unified platform pages:
@@ -117,7 +117,7 @@ def serve_root_css():
 
 
 if __name__ == "__main__":
-    print(" * Starting RudraX Concessional Finance Server...")
+    print(" * Starting UDYAMSetu Concessional Finance Server...")
     print(f" * Loaded {len(SCHEMES)} government schemes from schemes.json")
     print(" * Accessible at http://127.0.0.1:5000")
     app.run(debug=True, host="0.0.0.0", port=5000)

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RudraX — Financial Navigator &amp; Partner Locator</title>
+  <title>UDYAMSetu — Financial Navigator &amp; Partner Locator</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -148,9 +148,9 @@
   <div class="header-inner">
     <div class="brand-row">
       <div class="brand-identity">
-        <div class="brand-shield">RX</div>
+        <div class="brand-shield">US</div>
         <div class="brand-text">
-          <h1>RudraX</h1>
+          <h1>UDYAMSetu</h1>
           <p>Concessional Finance Navigator &amp; Eligibility Shield</p>
         </div>
       </div>
@@ -299,7 +299,7 @@
 <footer class="site-footer">
   <div class="footer-inner">
     <p>Interest rates, moratorium periods, and channel partner rankings are indicative and derived from official RBI and NSFDC notifications.</p>
-    <p class="attribution">Developed for <strong>Smart India Hackathon (SIH)</strong> &middot; Team <strong>RudraX</strong></p>
+    <p class="attribution">Developed for <strong>Smart India Hackathon (SIH)</strong> &middot; Team <strong>UDYAMSetu</strong></p>
   </div>
 </footer>
 
@@ -311,7 +311,8 @@ let SCHEMES = [
   { id: 'MFS04',  name: 'NSFDC Micro Finance Scheme', maxLoan: 140000, rate: 6.0, moratorium: 3, maxTenure: 60, purpose: 'micro' },
   { id: 'TLS05',  name: 'NSFDC Term Loan Scheme', maxLoan: 5000000, rate: 7.5, moratorium: 6, maxTenure: 84, purpose: 'term' },
   { id: 'ELS06',  name: 'NSFDC Educational Loan Scheme', maxLoan: 2000000, rate: 4.0, moratorium: 12, maxTenure: 120, purpose: 'education' },
-  { id: 'MMCS07', name: 'Mahila Micro Credit Scheme', maxLoan: 140000, rate: 4.0, moratorium: 3, maxTenure: 60, purpose: 'micro' }
+  { id: 'MMCS07', name: 'Mahila Micro Credit Scheme', maxLoan: 140000, rate: 4.0, moratorium: 3, maxTenure: 60, purpose: 'micro' },
+  { id: 'BSCC08', name: 'Bihar Student Credit Card (BSCC)', maxLoan: 400000, rate: 4.0, moratorium: 12, maxTenure: 120, purpose: 'education' }
 ];
 
 fetch('/api/schemes')
@@ -398,6 +399,7 @@ function calcEMI() {
 
 const MOCK_PARTNERS = [
   { name: 'State Channelizing Agency (SCA) District Office', type: 'SCA', lat: 25.5941, lng: 85.1376, fund_availability: 88, npa_ratio: 0.04, phone: '0612-2234901', address: 'Fraser Road, Patna' },
+  { name: 'District Registration & Counseling Centre (DRCC / BSCC)', type: 'DRCC', lat: 25.6150, lng: 85.1400, fund_availability: 95, npa_ratio: 0.02, phone: '1800-3456-444', address: 'DRCC Complex, Patna' },
   { name: 'Canara Bank — Dedicated Priority Sector Cell', type: 'PSB', lat: 25.6100, lng: 85.1600, fund_availability: 75, npa_ratio: 0.06, phone: '1800-425-0018', address: 'Exhibition Road, Patna' },
   { name: 'Uttar Bihar Gramin Bank — Head Office', type: 'RRB', lat: 25.5500, lng: 85.0900, fund_availability: 92, npa_ratio: 0.03, phone: '0612-2581023', address: 'Kalambagh Chowk' },
   { name: 'Punjab National Bank — Social Banking Desk', type: 'PSB', lat: 25.6000, lng: 85.0700, fund_availability: 68, npa_ratio: 0.08, phone: '1800-180-2222', address: 'Station Road' },
