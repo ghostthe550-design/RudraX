@@ -38,7 +38,9 @@ dummy_user = {
     "caste_category": "OBC",
     "education_level": 4,      # 4 = 12th Pass (see ordinal scale in schemes.json)
     "is_pwd": False,
-    "has_loan_default": False
+    # New field: one of NO_PRIOR_LOANS | ACTIVE_ON_TIME | PAST_MINOR_DELAYS | CURRENT_DEFAULT_NPA
+    "repayment_status": "NO_PRIOR_LOANS",
+    "cibil_range": ""          # Optional; empty string means not provided
 }
 
 
@@ -128,15 +130,34 @@ def evaluate_scheme(user, scheme):
             f"Education ({user_edu_label}) is below the required minimum ({min_edu_label})."
         )
 
-    # --- Check 5: Loan default history ---
+    # --- Check 5: Repayment track record (replaces binary has_loan_default) ---
+    # CURRENT_DEFAULT_NPA is the only hard-disqualifying value.
+    # PAST_MINOR_DELAYS is flagged with an advisory but does NOT disqualify.
+    # NO_PRIOR_LOANS and ACTIVE_ON_TIME both pass cleanly.
+    repayment_status = user.get("repayment_status", "NO_PRIOR_LOANS")
     allow_defaulters = rules.get("allow_defaulters", False)
-    if allow_defaulters or not user["has_loan_default"]:
-        passed_checks += 1
-        reasons_pass.append("Clean credit profile: no disqualifying bank loan default history.")
-    else:
+
+    if repayment_status == "CURRENT_DEFAULT_NPA" and not allow_defaulters:
         reasons_fail.append(
-            "Applicant has a bank loan default history, which disqualifies from loan sanction."
+            "Account is currently marked NPA / written off. You must regularise the account or "
+            "obtain a No-Objection Certificate before a loan can be sanctioned."
         )
+    else:
+        passed_checks += 1
+        if repayment_status == "NO_PRIOR_LOANS":
+            reasons_pass.append("First-time borrower / no prior loans — clean credit slate.")
+        elif repayment_status == "ACTIVE_ON_TIME":
+            reasons_pass.append("Active loans with all EMIs paid on time — strong repayment record.")
+        elif repayment_status == "PAST_MINOR_DELAYS":
+            reasons_pass.append(
+                "Past minor delays (1-30 days), now regularized — eligible to proceed. "
+                "Bank may request a clarification letter."
+            )
+        else:
+            reasons_pass.append("Repayment status accepted for this scheme.")
+
+    # Derive backward-compat has_loan_default for score-cap logic
+    has_loan_default = (repayment_status == "CURRENT_DEFAULT_NPA")
 
     # --- Additional Bonus: PwD (Divyang) Consideration ---
     if user.get("is_pwd"):
@@ -152,8 +173,8 @@ def evaluate_scheme(user, scheme):
     else:
         score_percent = round((passed_checks / total_checks) * 100)
 
-    # Default history hard cap: a bank loan cannot be sanctioned to a defaulter
-    if user["has_loan_default"] and not allow_defaulters:
+    # NPA hard cap: a bank loan cannot be sanctioned to a current defaulter
+    if has_loan_default and not allow_defaulters:
         if score_percent > 60:
             score_percent = 60
 
