@@ -46,13 +46,22 @@
     <div>
       <strong style="display:block; font-size: 0.88rem; color: var(--iron-500); text-transform: uppercase;" data-i18n="results.eval_profile">Evaluated Profile:</strong>
       <div class="profile-pills" style="margin-top: 6px;">
-        <span class="profile-pill">Age: {{ user.age }} yrs</span>
-        <span class="profile-pill">Gender: {{ user.gender }}</span>
-        <span class="profile-pill">Caste: {{ user.caste_category }}</span>
-        <span class="profile-pill">Education Level: {{ user.education_level }}</span>
-        <span class="profile-pill">Divyang: {{ 'Yes' if user.is_pwd else 'No' }}</span>
-        <span class="profile-pill">Credit Default: {{ 'Yes' if user.has_loan_default else 'None (Clean)' }}</span>
-      </div>
+          <span class="profile-pill">Age: {{ user.age }} yrs</span>
+          <span class="profile-pill">Gender: {{ user.gender }}</span>
+          <span class="profile-pill">Caste: {{ user.caste_category }}</span>
+          <span class="profile-pill">Education Level: {{ user.education_level }}</span>
+          <span class="profile-pill">Divyang: {{ 'Yes' if user.is_pwd else 'No' }}</span>
+          <span class="profile-pill">Repayment:
+            {% if user.repayment_status == 'NO_PRIOR_LOANS' %}First-time borrower
+            {% elif user.repayment_status == 'ACTIVE_ON_TIME' %}On-time EMIs
+            {% elif user.repayment_status == 'PAST_MINOR_DELAYS' %}Minor delays (regularized)
+            {% elif user.repayment_status == 'CURRENT_DEFAULT_NPA' %}⚠ NPA / Written-off
+            {% else %}{{ user.repayment_status }}{% endif %}
+          </span>
+          {% if user.cibil_range and user.cibil_range not in ('', 'DONT_KNOW') %}
+          <span class="profile-pill">CIBIL: {{ user.cibil_range | replace('_', ' ') }}</span>
+          {% endif %}
+        </div>
     </div>
     <a href="{{ url_for('index') }}" class="btn-outline btn-sm" data-i18n="results.btn_edit">Edit Profile</a>
   </div>
@@ -182,5 +191,6 @@
 </footer>
 
 <script src="{{ url_for('static', filename='i18n.js') }}"></script>
+<script src="{{ url_for('static', filename='chatbot.js') }}"></script>
 </body>
 </html>

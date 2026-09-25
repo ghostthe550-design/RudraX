@@ -20,7 +20,8 @@ data = {
     'caste_category': 'SC',
     'education_level': '4',
     'is_pwd': 'No',
-    'has_loan_default': 'No'
+    'repayment_status': 'NO_PRIOR_LOANS',
+    'cibil_range': '750_PLUS'
 }
 r = client.post('/results', data=data)
 assert r.status_code == 200, f'POST /results failed: {r.status_code}'

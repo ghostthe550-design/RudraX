@@ -43,7 +43,7 @@
 
   {% if request.args.get('error') == 'invalid_input' %}
     <div class="alert alert-danger" role="alert">
-      <span data-i18n="index.err_invalid_input"><strong>Missing Information:</strong> Please ensure every profile field is completed (including gender, caste, education, disability, and credit status).</span>
+      <span data-i18n="index.err_invalid_input"><strong>Missing Information:</strong> Please ensure every profile field is completed (including gender, caste, education, disability, and repayment history).</span>
     </div>
   {% elif request.args.get('error') == 'age_out_of_range' %}
     <div class="alert alert-danger" role="alert">
@@ -101,7 +101,7 @@
     </fieldset>
 
     <fieldset>
-      <legend data-i18n="index.legend_special">Special Eligibility &amp; Credit History</legend>
+      <legend data-i18n="index.legend_special">Special Eligibility &amp; Credit Assessment</legend>
 
       <div class="field">
         <span class="radio-legend" data-i18n="index.label_pwd">Are you a Person with Disability (Divyang)? *</span>
@@ -111,12 +111,45 @@
         </div>
       </div>
 
+      <!-- CREDIT ASSESSMENT: Option A — Repayment Track Record (Required) -->
       <div class="field">
-        <span class="radio-legend" data-i18n="index.label_default">Do you have a history of bank loan defaults or settlement write-offs? *</span>
-        <div class="radio-row">
-          <label><input type="radio" name="has_loan_default" value="Yes" required> <span data-i18n="index.opt_default_yes">Yes (History of default)</span></label>
-          <label><input type="radio" name="has_loan_default" value="No" checked> <span data-i18n="index.opt_default_no">No (Clean credit record)</span></label>
+        <label for="repayment_status" data-i18n="index.label_repayment">Repayment History of Existing / Past Loans &amp; Credit Cards *</label>
+        <p class="field-helper" data-i18n="index.helper_repayment">Prior home, auto, or personal loans do not disqualify you as long as repayments are regular.</p>
+        <select id="repayment_status" name="repayment_status" required onchange="handleRepaymentChange(this.value)">
+          <option value="" disabled selected data-i18n="index.opt_repayment_select">Select repayment history…</option>
+          <option value="NO_PRIOR_LOANS" data-i18n="index.opt_no_prior">No prior loans / First-time borrower</option>
+          <option value="ACTIVE_ON_TIME" data-i18n="index.opt_active_ontime">Active loans/cards, all EMIs paid on time</option>
+          <option value="PAST_MINOR_DELAYS" data-i18n="index.opt_minor_delays">Past minor delays (1-30 days), now regularized</option>
+          <option value="CURRENT_DEFAULT_NPA" data-i18n="index.opt_npa">Account currently marked NPA / 90+ days overdue / Written off</option>
+        </select>
+        <!-- Advisory note — shown conditionally by JS -->
+        <div id="advisory-minor-delay" class="advisory-note advisory-warning" style="display:none;" role="alert">
+          ⚠️ <strong>Advisory:</strong> May require additional bank clarification, but you remain eligible to proceed with the application.
         </div>
+        <div id="advisory-npa" class="advisory-note advisory-danger" style="display:none;" role="alert">
+          🚫 <strong>Current NPA / Write-off Detected:</strong> You must first regularise the account or obtain a No-Objection Certificate before applying. Contact a <a href="/navigator#locator" style="color:inherit;font-weight:700;">nearby channel agency</a> for a loan regularisation advisory.
+        </div>
+      </div>
+
+      <!-- CREDIT ASSESSMENT: Option B — CIBIL Score (Strictly Optional) -->
+      <div class="field">
+        <label for="cibil_range" data-i18n="index.label_cibil">
+          Estimated CIBIL / Credit Score
+          <span class="optional-tag" data-i18n="index.tag_optional">(Optional)</span>
+        </label>
+        <a href="https://www.cibil.com/freecibilscore" target="_blank" rel="noopener noreferrer"
+           class="cibil-check-link" data-i18n="index.cibil_link">
+          Check your CIBIL score for free on official bureau portal ↗
+        </a>
+        <p class="field-helper" data-i18n="index.helper_cibil">Don't know your score? Leave this blank — it will not affect your eligibility evaluation.</p>
+        <select id="cibil_range" name="cibil_range">
+          <option value="" selected data-i18n="index.opt_cibil_skip">— Leave blank / Not applicable —</option>
+          <option value="750_PLUS" data-i18n="index.opt_cibil_750">750 and above (Excellent)</option>
+          <option value="700_749" data-i18n="index.opt_cibil_700">700 – 749 (Good)</option>
+          <option value="650_699" data-i18n="index.opt_cibil_650">650 – 699 (Fair / Standard evaluation)</option>
+          <option value="BELOW_650" data-i18n="index.opt_cibil_below">Below 650</option>
+          <option value="DONT_KNOW" data-i18n="index.opt_cibil_unknown">I don't know / Not generated yet</option>
+        </select>
       </div>
     </fieldset>
 
@@ -135,5 +168,12 @@
 </footer>
 
 <script src="{{ url_for('static', filename='i18n.js') }}"></script>
+<script src="{{ url_for('static', filename='chatbot.js') }}"></script>
+<script>
+function handleRepaymentChange(val) {
+  document.getElementById('advisory-minor-delay').style.display = (val === 'PAST_MINOR_DELAYS') ? 'flex' : 'none';
+  document.getElementById('advisory-npa').style.display = (val === 'CURRENT_DEFAULT_NPA') ? 'flex' : 'none';
+}
+</script>
 </body>
 </html>
