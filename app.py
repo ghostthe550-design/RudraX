@@ -15,6 +15,7 @@ Connects frontend profile submission to the deterministic rules engine (engine.p
 
 import os
 import json
+import requests
 from flask import Flask, render_template, request, redirect, url_for, jsonify, send_from_directory
 from jinja2 import ChoiceLoader, FileSystemLoader
 from engine import load_schemes, run_engine
@@ -167,16 +168,16 @@ ALWAYS end your response with a reassuring, action-oriented closing sentence.
 
 @app.route("/api/chat", methods=["POST"])
 def api_chat():
-    """AI loan assistant endpoint.
+    """AI loan assistant endpoint with fallbacks.
     Expects JSON: { "message": "user query", "history": [{"role": "user"|"model", "parts": ["..."]}, ...] }
     Returns JSON: { "reply": "...", "error": null }
     """
-    if not _GENAI_AVAILABLE:
-        return jsonify({"reply": None, "error": "AI assistant unavailable: google-genai not installed."}), 503
-
     api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
-    if not api_key:
-        return jsonify({"reply": None, "error": "API key not configured on server."}), 503
+    groq_api_key = os.environ.get("GROQ_API_KEY")
+    openrouter_api_key = os.environ.get("OPENROUTER_API_KEY")
+
+    if not any([api_key, groq_api_key, openrouter_api_key]):
+        return jsonify({"reply": None, "error": "No AI API keys configured on server."}), 503
 
     try:
         body = request.get_json(force=True)
@@ -186,48 +187,106 @@ def api_chat():
         if not user_message:
             return jsonify({"reply": None, "error": "Empty message."}), 400
 
-        if _GENAI_NEW_SDK:
-            # ---- New google-genai SDK ----
-            client = google_genai.Client(api_key=api_key)
-            # Build contents list: system turn + history + current user message
-            contents = []
-            for h in history:
-                if h.get("role") in ("user", "model") and h.get("parts"):
-                    contents.append({"role": h["role"], "parts": [{"text": h["parts"][0]}]})
-            contents.append({"role": "user", "parts": [{"text": user_message}]})
+        # Models ordered by priority (fallback mechanism)
+        models_to_try = [
+            {"provider": "gemini", "model": "gemini-3.8-flash"},
+            {"provider": "gemini", "model": "gemini-3.6-flash"},
+            {"provider": "gemini", "model": "gemini-3.5-flash"},
+            {"provider": "groq", "model": "llama-3.3-70b-versatile"}, # Assuming this as GPT-OSS equivalent
+            {"provider": "openrouter", "model": "openrouter/auto"}
+        ]
 
-            gemini_model = os.environ.get("GEMINI_MODEL", "gemini-3.8-flash")
-            response = client.models.generate_content(
-                model=gemini_model,
-                contents=contents,
-                config=google_genai.types.GenerateContentConfig(
-                    system_instruction=_CHATBOT_SYSTEM_PROMPT,
-                    temperature=0.5,
-                    max_output_tokens=600,
-                )
-            )
-            reply_text = response.text
+        reply_text = None
+        last_error = None
+
+        for m in models_to_try:
+            provider = m["provider"]
+            model_name = m["model"]
+            try:
+                if provider == "gemini":
+                    if not _GENAI_AVAILABLE or not api_key:
+                        continue
+                    
+                    if _GENAI_NEW_SDK:
+                        client = google_genai.Client(api_key=api_key)
+                        contents = []
+                        for h in history:
+                            if h.get("role") in ("user", "model") and h.get("parts"):
+                                contents.append({"role": h["role"], "parts": [{"text": h["parts"][0]}]})
+                        contents.append({"role": "user", "parts": [{"text": user_message}]})
+                        
+                        response = client.models.generate_content(
+                            model=model_name,
+                            contents=contents,
+                            config=google_genai.types.GenerateContentConfig(
+                                system_instruction=_CHATBOT_SYSTEM_PROMPT,
+                                temperature=0.5,
+                                max_output_tokens=600,
+                            )
+                        )
+                        reply_text = response.text
+                        break
+                    else:
+                        import google.generativeai as genai_legacy  # noqa: PLC0415
+                        import warnings
+                        genai_legacy.configure(api_key=api_key)
+                        model = genai_legacy.GenerativeModel(
+                            model_name=model_name,
+                            system_instruction=_CHATBOT_SYSTEM_PROMPT
+                        )
+                        chat = model.start_chat(history=[
+                            {"role": h["role"], "parts": [h["parts"][0]]}
+                            for h in history
+                            if h.get("role") in ("user", "model") and h.get("parts")
+                        ])
+                        with warnings.catch_warnings():
+                            warnings.simplefilter("ignore")
+                            resp = chat.send_message(user_message)
+                        reply_text = resp.text
+                        break
+
+                elif provider in ["groq", "openrouter"]:
+                    current_key = groq_api_key if provider == "groq" else openrouter_api_key
+                    if not current_key:
+                        continue
+                        
+                    url = "https://api.groq.com/openai/v1/chat/completions" if provider == "groq" else "https://openrouter.ai/api/v1/chat/completions"
+                    headers = {
+                        "Authorization": f"Bearer {current_key}",
+                        "Content-Type": "application/json"
+                    }
+                    if provider == "openrouter":
+                        headers["HTTP-Referer"] = "http://localhost:5000"
+                        headers["X-Title"] = "UDYAMSetu"
+                        
+                    messages = [{"role": "system", "content": _CHATBOT_SYSTEM_PROMPT}]
+                    for h in history:
+                        if h.get("role") in ("user", "model") and h.get("parts"):
+                            role = "assistant" if h["role"] == "model" else "user"
+                            messages.append({"role": role, "content": h["parts"][0]})
+                    messages.append({"role": "user", "content": user_message})
+                    
+                    payload = {
+                        "model": model_name,
+                        "messages": messages,
+                        "temperature": 0.5,
+                        "max_tokens": 600
+                    }
+                    
+                    response = requests.post(url, headers=headers, json=payload, timeout=15)
+                    response.raise_for_status()
+                    reply_text = response.json()["choices"][0]["message"]["content"]
+                    break
+
+            except Exception as e:
+                last_error = str(e)
+                print(f"Fallback warning: {provider} {model_name} failed - {e}")
+                continue
+
+        if reply_text:
+            return jsonify({"reply": reply_text, "error": None})
         else:
-            # ---- Legacy google.generativeai SDK (fallback) ----
-            import google.generativeai as genai_legacy  # noqa: PLC0415
-            import warnings
-            genai_legacy.configure(api_key=api_key)
-            gemini_model = os.environ.get("GEMINI_MODEL", "gemini-3.8-flash")
-            model = genai_legacy.GenerativeModel(
-                model_name=gemini_model,
-                system_instruction=_CHATBOT_SYSTEM_PROMPT
-            )
-            chat = model.start_chat(history=[
-                {"role": h["role"], "parts": [h["parts"][0]]}
-                for h in history
-                if h.get("role") in ("user", "model") and h.get("parts")
-            ])
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
-                resp = chat.send_message(user_message)
-            reply_text = resp.text
-
-        return jsonify({"reply": reply_text, "error": None})
+            return jsonify({"reply": None, "error": f"All AI models failed. Last error: {last_error}"}), 503
 
     except Exception as exc:  # noqa: BLE001
         return jsonify({"reply": None, "error": str(exc)}), 500

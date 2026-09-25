@@ -16,7 +16,7 @@
     <!-- Floating Action Button -->
     <button id="chat-fab" type="button" aria-expanded="false" aria-controls="chat-modal">
       <span class="fab-icon" aria-hidden="true">💬</span>
-      <span class="fab-label">Ask AI about Stand-Up India &amp; NSFDC</span>
+      <span class="fab-label">Ask UDYAMSetu</span>
     </button>
 
     <!-- Chat Modal -->
