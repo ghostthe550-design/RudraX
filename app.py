@@ -196,8 +196,9 @@ def api_chat():
                     contents.append({"role": h["role"], "parts": [{"text": h["parts"][0]}]})
             contents.append({"role": "user", "parts": [{"text": user_message}]})
 
+            gemini_model = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
             response = client.models.generate_content(
-                model="gemini-2.0-flash",
+                model=gemini_model,
                 contents=contents,
                 config=google_genai.types.GenerateContentConfig(
                     system_instruction=_CHATBOT_SYSTEM_PROMPT,
@@ -211,8 +212,9 @@ def api_chat():
             import google.generativeai as genai_legacy  # noqa: PLC0415
             import warnings
             genai_legacy.configure(api_key=api_key)
+            gemini_model = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
             model = genai_legacy.GenerativeModel(
-                model_name="gemini-1.5-flash",
+                model_name=gemini_model,
                 system_instruction=_CHATBOT_SYSTEM_PROMPT
             )
             chat = model.start_chat(history=[
