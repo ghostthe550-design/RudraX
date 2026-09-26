@@ -28,7 +28,7 @@
           <div class="chat-avatar" aria-hidden="true">🤖</div>
           <div class="chat-header-text">
             <h4>UDYAMSetu AI</h4>
-            <p>Stand-Up India &amp; NSFDC Advisor</p>
+            <p>Government Schemes Advisor</p>
           </div>
         </div>
         <button id="chat-close-btn" type="button" aria-label="Close chat assistant">✕</button>
@@ -39,9 +39,9 @@
 
       <!-- Suggestion chips — shown until user sends first message -->
       <div class="chat-chips" id="chat-chips">
-        <button class="chat-chip" type="button">Am I eligible with an existing home loan?</button>
-        <button class="chat-chip" type="button">What documents are required for Stand-Up India?</button>
-        <button class="chat-chip" type="button">What is the family income limit for NSFDC?</button>
+        <button class="chat-chip" type="button">What schemes are available for small businesses?</button>
+        <button class="chat-chip" type="button">Tell me about agriculture and farmer schemes.</button>
+        <button class="chat-chip" type="button">How can I get an education loan subsidy?</button>
       </div>
 
       <!-- Input row -->
@@ -96,7 +96,7 @@
     // Show greeting on first open
     if (conversationHistory.length === 0) {
       appendAssistantBubble(
-        '👋 Hello! I\'m the UDYAMSetu AI advisor.\n\nI can help you understand eligibility for **Stand-Up India** and **NSFDC** schemes, required documents, income limits, and more.\n\nPlease use the quick-start chips below or type your question — having an active home loan is perfectly fine! 😊'
+        '👋 Hello! I\'m the UDYAMSetu AI advisor.\n\nI can help you understand eligibility, subsidies, and required documents for **all Indian government schemes**.\n\nPlease use the quick-start chips below or type your question to discover schemes tailored for you! 😊'
       );
     }
   }
@@ -239,7 +239,7 @@
       if (data.error) {
         appendAssistantBubble(
           '⚠️ Sorry, I\'m temporarily unavailable. ' + data.error +
-          '\n\nFor direct assistance, call the **Stand-Up India helpline: 1800-180-1111** or visit standupmitra.in.'
+          '\n\nFor direct assistance, please visit the official government portal at **myscheme.gov.in**.'
         );
       } else {
         const replyText = data.reply || 'I could not generate a response. Please try again.';
@@ -250,7 +250,7 @@
     } catch (err) {
       removeLoadingDots();
       appendAssistantBubble(
-        '⚠️ Network error — please check your connection and try again.\n\nFor immediate help, visit **standupmitra.in** or call **1800-180-1111**.'
+        '⚠️ Network error — please check your connection and try again.\n\nFor immediate help, please visit **myscheme.gov.in**.'
       );
       console.error('[UDYAMSetu Chat]', err);
     } finally {

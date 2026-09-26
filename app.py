@@ -101,8 +101,115 @@ def results():
     if not (18 <= user["age"] <= 99):
         return redirect(url_for("index", error="age_out_of_range"))
 
-    # Execute deterministic matching engine against scheme repository
-    match_results = run_engine(user, SCHEMES)
+    # Helper function for live AI search
+    def get_live_schemes_gemini(user_profile):
+        if not _GENAI_AVAILABLE:
+            return []
+        
+        api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
+        if not api_key:
+            return []
+
+        prompt = f"""
+You are a government scheme discovery AI. You MUST search the live web (e.g., myscheme.gov.in, gov.in) to find the most relevant active government schemes in India for this applicant:
+Age: {user_profile.get('age')}
+Gender: {user_profile.get('gender')}
+Caste: {user_profile.get('caste_category')}
+Education Level (0-6): {user_profile.get('education_level')}
+PwD (Divyang): {user_profile.get('is_pwd')}
+Repayment Status: {user_profile.get('repayment_status')}
+CIBIL Range: {user_profile.get('cibil_range')}
+
+Return a JSON array of scheme objects. Ensure valid JSON.
+Schema for each object:
+[
+  {{
+    "scheme_id": "Unique string ID (e.g. LIVE-01)",
+    "scheme_name": "Name of the Scheme (Live Search)",
+    "issuing_authority": "Authority name + URL citation",
+    "loan_category": "Type of loan or benefit",
+    "max_loan_amount": 1000000,
+    "min_loan_amount": 50000,
+    "interest_rate_range": "e.g. 5% - 8%",
+    "match_score": 95,
+    "status": "Eligible",
+    "reasons_pass": ["Why they pass based on live data"],
+    "reasons_fail": [],
+    "application_steps": ["Step 1..."],
+    "contact_and_apply": {{
+        "portal_url": "URL to apply",
+        "toll_free_helpline": "Phone number",
+        "support_email": "Email",
+        "designated_physical_office": "Office details"
+    }}
+  }}
+]
+IMPORTANT: Return ONLY the JSON array. Do not wrap in markdown.
+"""
+        model_name = os.environ.get("GEMINI_MODEL", "gemini-3.8-flash")
+        
+        if _GENAI_NEW_SDK:
+            client = google_genai.Client(api_key=api_key)
+            try:
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=prompt,
+                    config=google_genai.types.GenerateContentConfig(
+                        tools=[{"google_search": {}}],
+                        temperature=0.2,
+                        response_mime_type="application/json"
+                    )
+                )
+            except Exception:
+                # Fallback if tools argument fails
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=prompt,
+                    config=google_genai.types.GenerateContentConfig(
+                        temperature=0.2,
+                        response_mime_type="application/json"
+                    )
+                )
+            text = response.text
+        else:
+            import google.generativeai as genai_legacy
+            genai_legacy.configure(api_key=api_key)
+            model = genai_legacy.GenerativeModel(model_name=model_name)
+            resp = model.generate_content(prompt)
+            text = resp.text
+
+        text = text.strip()
+        if text.startswith("```json"):
+            text = text[7:]
+        if text.startswith("```"):
+            text = text[3:]
+        if text.endswith("```"):
+            text = text[:-3]
+        text = text.strip()
+
+        data = json.loads(text)
+        if isinstance(data, list):
+            return data
+        elif isinstance(data, dict) and "schemes" in data:
+            return data["schemes"]
+        return []
+
+    # Execute matching
+    match_results = []
+    
+    # Try Live Gemini Search First
+    try:
+        live_results = get_live_schemes_gemini(user)
+        if live_results and isinstance(live_results, list) and len(live_results) > 0:
+            match_results = live_results
+    except Exception as e:
+        print(f"Live search failed: {e}")
+        pass
+        
+    # Fallback to local DB
+    if not match_results:
+        print("Falling back to local static DB.")
+        match_results = run_engine(user, SCHEMES)
 
     return render_template("results.html", user=user, results=match_results)
 
@@ -128,40 +235,16 @@ def api_schemes():
 # ---------------------------------------------------------------------------
 # AI Loan Assistant Chat API
 # ---------------------------------------------------------------------------
-_CHATBOT_SYSTEM_PROMPT = """You are UDYAMSetu AI — a knowledgeable, empathetic loan guidance assistant
-specialised in Indian government concessional finance schemes. Answer only questions related to
-loan eligibility, documentation, and scheme details. Be concise, warm, and use simple language.
+_CHATBOT_SYSTEM_PROMPT = """You are UDYAMSetu AI — a knowledgeable, empathetic loan and scheme guidance assistant
+specialised in ALL Indian government schemes (Central and State level). Answer questions related to
+scheme eligibility, documentation, subsidies, and benefits for citizens and businesses. Be concise, warm, and use simple language.
 
-KEY SCHEME FACTS YOU MUST APPLY ACCURATELY:
-
-## Stand-Up India Scheme
-- Administered by SIDBI / Lead district banks under RBI mandate.
-- Target: SC, ST, or Women entrepreneurs setting up a GREENFIELD enterprise only.
-- Loan range: ₹10 Lakh to ₹1 Crore (composite term loan + working capital).
-- Collateral: Credit Guarantee Fund Trust for Micro & Small Enterprises (CGTMSE) covers.
-- CRITICAL: Having an active home loan, vehicle loan, or personal loan does NOT disqualify.
-  Only current NPA / loan write-off status disqualifies. Applicants with regular running loans
-  (even home loans) are fully eligible.
-- Moratorium: typically 18 months.
-- Apply via: standupmitra.in or designated lead bank branch.
-
-## NSFDC (National Scheduled Castes Finance & Development Corporation)
-- Target: SC beneficiaries ONLY.
-- Annual family income ceiling: Urban ≤ ₹3 Lakh; Rural ≤ ₹2 Lakh (poverty line × 3).
-  (Many state SCAs use a combined ceiling of ≤ ₹5 Lakh — clarify with local SCA.)
-- Loan range: micro-finance ₹20,000 – ₹1.4 Lakh (MFS) to term loans up to ₹50 Lakh (TLS).
-- Interest: 5% – 8% p.a. channelled through State Channelising Agencies (SCAs).
-- Clean repayment track record is required; minor past delays may be reviewed case-by-case.
-- Current NPA disqualifies.
-
-## GENERAL GUIDANCE
-- Always reassure applicants that having standard running loans (home, auto, personal) does NOT
-  prevent them from applying — only active NPA / write-off status does.
-- Encourage applicants to provide accurate information; there is no penalty for disclosing
-  legitimate existing loans.
-- For CIBIL scores: a score of 700+ is ideal, but many concessional schemes are
-  CIBIL-score-relaxed for SC/ST/Women under priority-sector lending mandates.
-- If you don't know the answer, say so clearly and direct users to the relevant helpline or portal.
+KEY GUIDANCE YOU MUST APPLY:
+- You possess broad knowledge of ALL government schemes in India (e.g., PM-EGP, PM-SVANidhi, Stand-Up India, Mudra Yojana, PM Kisan, Ayushman Bharat, Startup India, NSFDC, etc.).
+- Help users navigate through the vast landscape of schemes by asking clarifying questions about their profile if needed.
+- Reassure applicants that there are schemes available for all sectors, genders, and social categories.
+- Encourage applicants to provide accurate information.
+- If you don't know the exact details of a niche or newly announced scheme, provide the best available general guidance and direct users to official portals like myscheme.gov.in or india.gov.in.
 
 ALWAYS end your response with a reassuring, action-oriented closing sentence.
 """
