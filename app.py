@@ -376,6 +376,161 @@ def api_chat():
 
 
 
+# ---------------------------------------------------------------------------
+# AI Natural Language Scheme Search API
+# ---------------------------------------------------------------------------
+@app.route("/api/ai-search", methods=["POST"])
+def api_ai_search():
+    """
+    Accepts a free-text query (e.g. 'schemes for women entrepreneurs in SC category')
+    and returns matched schemes from the local DB, ranked by AI relevance.
+
+    Expects JSON: { "query": "natural language search query" }
+    Returns JSON: { "results": [...], "query_interpretation": "...", "error": null }
+    """
+    try:
+        body = request.get_json(force=True)
+        query = (body.get("query") or "").strip()
+
+        if not query:
+            return jsonify({"results": [], "query_interpretation": "", "error": "Empty query."}), 400
+
+        # Build a compact scheme catalogue for the prompt (scheme_id + name + key fields)
+        scheme_catalogue = []
+        for s in SCHEMES:
+            rules = s.get("eligibility_rules", {})
+            scheme_catalogue.append({
+                "scheme_id": s.get("scheme_id"),
+                "scheme_name": s.get("scheme_name"),
+                "loan_category": s.get("loan_category"),
+                "issuing_authority": s.get("issuing_authority"),
+                "max_loan_amount": s.get("max_loan_amount"),
+                "min_loan_amount": s.get("min_loan_amount"),
+                "interest_rate_range": s.get("interest_rate_range"),
+                "purpose": s.get("purpose"),
+                "allowed_genders": rules.get("allowed_genders", []),
+                "allowed_castes": rules.get("allowed_castes", []),
+                "min_age": rules.get("min_age"),
+                "max_age": rules.get("max_age"),
+                "pwd_eligible": rules.get("pwd_eligible"),
+                "special_conditions": rules.get("special_conditions", []),
+            })
+
+        prompt = f"""You are a government scheme matching AI for India.
+A user has typed this search query: "{query}"
+
+Here is the catalogue of available schemes as JSON:
+{json.dumps(scheme_catalogue, indent=2)}
+
+TASK:
+1. Interpret the user's query to understand what kind of scheme they are looking for.
+2. Select the most relevant schemes (up to 6) from the catalogue above that match the query.
+3. For each selected scheme, assign a relevance match_score (0-100) based on how well it fits.
+4. Provide a short, friendly human-readable interpretation of the query (1 sentence).
+
+Return a JSON object with this exact schema:
+{{
+  "query_interpretation": "Brief 1-sentence interpretation of what the user is looking for",
+  "matched_ids": [
+    {{
+      "scheme_id": "ID from catalogue",
+      "match_score": 85,
+      "reasons": ["Reason 1 why this scheme matches", "Reason 2"]
+    }}
+  ]
+}}
+
+IMPORTANT:
+- Only include scheme_ids that exist in the catalogue above.
+- matched_ids must be sorted by match_score descending.
+- Return ONLY the JSON object. No markdown fences.
+"""
+
+        query_interpretation = f'Showing results for: "{query}"'
+        matched_ids = []
+
+        api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
+
+        if _GENAI_AVAILABLE and api_key:
+            model_name = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
+            try:
+                if _GENAI_NEW_SDK:
+                    client = google_genai.Client(api_key=api_key)
+                    response = client.models.generate_content(
+                        model=model_name,
+                        contents=prompt,
+                        config=google_genai.types.GenerateContentConfig(
+                            temperature=0.2,
+                            response_mime_type="application/json"
+                        )
+                    )
+                    raw = response.text
+                else:
+                    import google.generativeai as genai_legacy
+                    genai_legacy.configure(api_key=api_key)
+                    model_obj = genai_legacy.GenerativeModel(model_name=model_name)
+                    resp = model_obj.generate_content(prompt)
+                    raw = resp.text
+
+                raw = raw.strip()
+                if raw.startswith("```json"):
+                    raw = raw[7:]
+                if raw.startswith("```"):
+                    raw = raw[3:]
+                if raw.endswith("```"):
+                    raw = raw[:-3]
+                raw = raw.strip()
+
+                ai_result = json.loads(raw)
+                query_interpretation = ai_result.get("query_interpretation", query_interpretation)
+                matched_ids = ai_result.get("matched_ids", [])
+
+            except Exception as e:
+                print(f"AI search Gemini error: {e}")
+                # Fall through to keyword fallback
+
+        # If AI returned nothing or failed, keyword fallback
+        if not matched_ids:
+            q_lower = query.lower()
+            for s in SCHEMES:
+                searchable = " ".join([
+                    s.get("scheme_name", ""),
+                    s.get("loan_category", ""),
+                    s.get("issuing_authority", ""),
+                    s.get("purpose", ""),
+                    " ".join(s.get("eligibility_rules", {}).get("special_conditions", []))
+                ]).lower()
+                if any(word in searchable for word in q_lower.split() if len(word) > 3):
+                    matched_ids.append({
+                        "scheme_id": s["scheme_id"],
+                        "match_score": 70,
+                        "reasons": ["Keyword match with your search query"]
+                    })
+            matched_ids = matched_ids[:6]
+
+        # Build full scheme objects for the matched IDs
+        scheme_map = {s["scheme_id"]: s for s in SCHEMES}
+        results = []
+        for match in matched_ids:
+            sid = match.get("scheme_id")
+            scheme = scheme_map.get(sid)
+            if scheme:
+                enriched = dict(scheme)
+                enriched["match_score"] = match.get("match_score", 70)
+                enriched["reasons_pass"] = match.get("reasons", [])
+                enriched["status"] = "Eligible"
+                results.append(enriched)
+
+        return jsonify({
+            "results": results,
+            "query_interpretation": query_interpretation,
+            "error": None
+        })
+
+    except Exception as exc:
+        return jsonify({"results": [], "query_interpretation": "", "error": str(exc)}), 500
+
+
 @app.route("/style.css", methods=["GET"])
 def serve_root_css():
     """Fallback route to ensure style.css serves properly under any link reference."""

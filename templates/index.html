@@ -41,6 +41,48 @@
     <p data-i18n="index.hero_subtitle">Answer a few straightforward profile questions. Our transparent rules engine evaluates eligibility, computes compatibility scores, and details exact qualification reasons.</p>
   </div>
 
+  <!-- ================================================================
+       AI Scheme Search — Natural Language Quick Finder
+  ================================================================ -->
+  <div class="ai-search-section" id="ai-search-section">
+    <div class="ai-search-header">
+      <span class="ai-search-badge">AI Search</span>
+      <div>
+        <div class="ai-search-title">Search Schemes with AI</div>
+        <div class="ai-search-subtitle">Type what you need in plain English — our AI will find the best matching schemes instantly.</div>
+      </div>
+    </div>
+
+    <div class="ai-search-bar">
+      <div class="ai-search-input-wrap">
+        <span class="ai-search-icon" aria-hidden="true">🔍</span>
+        <input
+          type="text"
+          id="ai-search-input"
+          placeholder="e.g. schemes for women entrepreneurs, or agriculture loan for SC farmers…"
+          maxlength="300"
+          autocomplete="off"
+          aria-label="Search government schemes using AI"
+        />
+      </div>
+      <button type="button" id="ai-search-btn" aria-label="Search with AI">
+        <span id="ai-search-btn-icon">✦</span> Search with AI
+      </button>
+    </div>
+
+    <div class="ai-search-suggestions" id="ai-suggestion-pills">
+      <button class="ai-suggestion-pill" type="button">Schemes for women entrepreneurs</button>
+      <button class="ai-suggestion-pill" type="button">Agriculture loans for SC farmers</button>
+      <button class="ai-suggestion-pill" type="button">Business loan for youth with low CIBIL</button>
+      <button class="ai-suggestion-pill" type="button">Startup funding for Divyang applicants</button>
+      <button class="ai-suggestion-pill" type="button">Education loan subsidies</button>
+      <button class="ai-suggestion-pill" type="button">Microfinance for street vendors</button>
+    </div>
+
+    <!-- Results injected here by JS -->
+    <div id="ai-search-results"></div>
+  </div>
+
   {% if request.args.get('error') == 'invalid_input' %}
     <div class="alert alert-danger" role="alert">
       <span data-i18n="index.err_invalid_input"><strong>Missing Information:</strong> Please ensure every profile field is completed (including gender, caste, education, disability, and repayment history).</span>
@@ -174,6 +216,208 @@ function handleRepaymentChange(val) {
   document.getElementById('advisory-minor-delay').style.display = (val === 'PAST_MINOR_DELAYS') ? 'flex' : 'none';
   document.getElementById('advisory-npa').style.display = (val === 'CURRENT_DEFAULT_NPA') ? 'flex' : 'none';
 }
+
+/* =========================================================
+   AI Scheme Search Widget
+   ========================================================= */
+(function () {
+  'use strict';
+
+  const searchInput  = document.getElementById('ai-search-input');
+  const searchBtn    = document.getElementById('ai-search-btn');
+  const btnIcon      = document.getElementById('ai-search-btn-icon');
+  const resultsEl    = document.getElementById('ai-search-results');
+  const pillsEl      = document.getElementById('ai-suggestion-pills');
+
+  let isSearching = false;
+
+  // ── Suggestion pills ──
+  pillsEl.querySelectorAll('.ai-suggestion-pill').forEach(function (pill) {
+    pill.addEventListener('click', function () {
+      if (isSearching) return;
+      searchInput.value = pill.textContent.trim();
+      runSearch();
+    });
+  });
+
+  // ── Enter key ──
+  searchInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !isSearching && searchInput.value.trim()) {
+      e.preventDefault();
+      runSearch();
+    }
+  });
+
+  // ── Button click ──
+  searchBtn.addEventListener('click', function () {
+    if (!isSearching && searchInput.value.trim()) runSearch();
+  });
+
+  function fmt(num) {
+    if (!num && num !== 0) return '—';
+    return '₹' + Number(num).toLocaleString('en-IN');
+  }
+
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  function renderSchemeCard(scheme) {
+    var score    = scheme.match_score || 0;
+    var reasons  = (scheme.reasons_pass || []).slice(0, 3);
+    var contact  = scheme.contact_and_apply || {};
+    var portal   = contact.portal_url || '';
+    var schemeId = scheme.scheme_id || '';
+    var amount   = scheme.max_loan_amount || 0;
+
+    var reasonsHtml = '';
+    if (reasons.length) {
+      reasonsHtml = '<div class="ai-card-reasons">';
+      reasonsHtml += '<div class="ai-reasons-label">Why it matches</div>';
+      reasonsHtml += '<ul class="ai-reasons-list">';
+      reasons.forEach(function (r) {
+        reasonsHtml += '<li>' + escHtml(r) + '</li>';
+      });
+      reasonsHtml += '</ul></div>';
+    }
+
+    var portalLink = portal
+      ? '<a href="https://' + escHtml(portal) + '" target="_blank" rel="noopener noreferrer" class="btn-outline btn-sm" style="font-size:0.78rem;">Apply ↗</a>'
+      : '';
+
+    var calcLink = '<a href="/navigator?scheme=' + encodeURIComponent(schemeId) + '&amount=' + amount + '" class="btn-primary btn-sm" style="font-size:0.78rem;">Calculate EMI →</a>';
+
+    return [
+      '<div class="ai-scheme-card">',
+        '<div class="ai-card-head">',
+          '<div>',
+            '<div class="ai-card-name">' + escHtml(scheme.scheme_name || 'Unknown Scheme') + '</div>',
+            '<div class="ai-card-authority">' + escHtml(scheme.issuing_authority || '') + ' &middot; ' + escHtml(scheme.loan_category || '') + '</div>',
+          '</div>',
+          '<div class="ai-match-score">',
+            '<div class="ai-score-ring" style="--pct:' + score + '">',
+              '<span class="ai-score-value">' + score + '%</span>',
+            '</div>',
+            '<div class="ai-score-label">match</div>',
+          '</div>',
+        '</div>',
+        '<div class="ai-card-metrics">',
+          '<span class="ai-metric-tag">Max: <strong>' + fmt(scheme.max_loan_amount) + '</strong></span>',
+          '<span class="ai-metric-tag">Rate: <strong>' + escHtml(scheme.interest_rate_range || '—') + '</strong></span>',
+          '<span class="ai-metric-tag">ID: <strong>' + escHtml(schemeId) + '</strong></span>',
+        '</div>',
+        reasonsHtml,
+        '<div class="ai-card-actions">',
+          calcLink,
+          portalLink,
+        '</div>',
+      '</div>'
+    ].join('');
+  }
+
+  async function runSearch() {
+    var query = searchInput.value.trim();
+    if (!query || isSearching) return;
+
+    isSearching = true;
+    searchBtn.disabled = true;
+    searchBtn.classList.add('ai-search-btn--searching');
+    btnIcon.textContent = '⏳';
+
+    // Show spinner
+    resultsEl.innerHTML = [
+      '<div class="ai-results-header">',
+        '<div class="ai-results-title">🔍 Searching…</div>',
+      '</div>',
+      '<div class="ai-spinner-wrap">',
+        '<div class="ai-spinner"></div>',
+        '<span>AI is analysing your query and matching schemes…</span>',
+      '</div>'
+    ].join('');
+
+    try {
+      var response = await fetch('/api/ai-search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: query })
+      });
+      var data = await response.json();
+
+      if (data.error && !data.results.length) {
+        resultsEl.innerHTML = [
+          '<div class="ai-results-header">',
+            '<div class="ai-results-title">⚠️ Search Error</div>',
+          '</div>',
+          '<div class="ai-search-empty">',
+            '<p><strong>Could not complete search</strong>' + escHtml(data.error) + '</p>',
+          '</div>'
+        ].join('');
+        return;
+      }
+
+      var results = data.results || [];
+      var interp  = data.query_interpretation || query;
+
+      if (!results.length) {
+        resultsEl.innerHTML = [
+          '<div class="ai-results-header">',
+            '<div class="ai-results-title">No Matches Found</div>',
+            '<button class="ai-clear-btn" id="ai-clear">Clear ✕</button>',
+          '</div>',
+          '<div class="ai-search-empty">',
+            '<p><strong>No schemes matched your query.</strong>',
+            'Try using different keywords, or fill in the profile form below for a full eligibility check.</p>',
+          '</div>'
+        ].join('');
+      } else {
+        var cardsHtml = results.map(renderSchemeCard).join('');
+        resultsEl.innerHTML = [
+          '<div class="ai-results-header">',
+            '<div class="ai-results-title">',
+              '✦ AI Results ',
+              '<span class="ai-results-count">' + results.length + ' schemes</span>',
+            '</div>',
+            '<button class="ai-clear-btn" id="ai-clear">Clear ✕</button>',
+          '</div>',
+          '<p style="font-size:0.82rem; color:var(--iron-600); margin-bottom:14px; font-style:italic;">' + escHtml(interp) + '</p>',
+          cardsHtml,
+          '<p style="font-size:0.78rem; color:var(--iron-500); margin-top:8px;">💡 For a full eligibility report with detailed scoring, complete the profile form below.</p>'
+        ].join('');
+      }
+
+      // Clear button
+      var clearBtn = document.getElementById('ai-clear');
+      if (clearBtn) {
+        clearBtn.addEventListener('click', function () {
+          resultsEl.innerHTML = '';
+          searchInput.value = '';
+        });
+      }
+
+      // Smooth scroll to results
+      resultsEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    } catch (err) {
+      resultsEl.innerHTML = [
+        '<div class="ai-results-header">',
+          '<div class="ai-results-title">⚠️ Network Error</div>',
+        '</div>',
+        '<div class="ai-search-empty">',
+          '<p><strong>Could not reach the server.</strong> Please check your connection and try again.</p>',
+        '</div>'
+      ].join('');
+      console.error('[AI Search]', err);
+    } finally {
+      isSearching = false;
+      searchBtn.disabled = false;
+      searchBtn.classList.remove('ai-search-btn--searching');
+      btnIcon.textContent = '✦';
+    }
+  }
+})();
 </script>
 </body>
 </html>
