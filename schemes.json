@@ -15,8 +15,17 @@
       "eligibility_rules": {
         "min_age": 18,
         "max_age": 99,
-        "allowed_genders": ["Male", "Female", "Other"],
-        "allowed_castes": ["General", "SC", "ST", "OBC"],
+        "allowed_genders": [
+          "Male",
+          "Female",
+          "Other"
+        ],
+        "allowed_castes": [
+          "General",
+          "SC",
+          "ST",
+          "OBC"
+        ],
         "min_education_level": 0,
         "allow_defaulters": false,
         "pwd_eligible": true,
@@ -54,8 +63,17 @@
       "eligibility_rules": {
         "min_age": 18,
         "max_age": 99,
-        "allowed_genders": ["Male", "Female", "Other"],
-        "allowed_castes": ["General", "SC", "ST", "OBC"],
+        "allowed_genders": [
+          "Male",
+          "Female",
+          "Other"
+        ],
+        "allowed_castes": [
+          "General",
+          "SC",
+          "ST",
+          "OBC"
+        ],
         "min_education_level": 0,
         "allow_defaulters": false,
         "pwd_eligible": true,
@@ -94,8 +112,17 @@
       "eligibility_rules": {
         "min_age": 18,
         "max_age": 99,
-        "allowed_genders": ["Male", "Female", "Other"],
-        "allowed_castes": ["General", "SC", "ST", "OBC"],
+        "allowed_genders": [
+          "Male",
+          "Female",
+          "Other"
+        ],
+        "allowed_castes": [
+          "General",
+          "SC",
+          "ST",
+          "OBC"
+        ],
         "min_education_level": 2,
         "allow_defaulters": false,
         "pwd_eligible": true,
@@ -134,8 +161,14 @@
       "eligibility_rules": {
         "min_age": 18,
         "max_age": 70,
-        "allowed_genders": ["Male", "Female", "Other"],
-        "allowed_castes": ["SC"],
+        "allowed_genders": [
+          "Male",
+          "Female",
+          "Other"
+        ],
+        "allowed_castes": [
+          "SC"
+        ],
         "min_education_level": 0,
         "allow_defaulters": false,
         "pwd_eligible": true,
@@ -174,8 +207,14 @@
       "eligibility_rules": {
         "min_age": 18,
         "max_age": 70,
-        "allowed_genders": ["Male", "Female", "Other"],
-        "allowed_castes": ["SC"],
+        "allowed_genders": [
+          "Male",
+          "Female",
+          "Other"
+        ],
+        "allowed_castes": [
+          "SC"
+        ],
         "min_education_level": 0,
         "allow_defaulters": false,
         "pwd_eligible": true,
@@ -214,8 +253,14 @@
       "eligibility_rules": {
         "min_age": 18,
         "max_age": 35,
-        "allowed_genders": ["Male", "Female", "Other"],
-        "allowed_castes": ["SC"],
+        "allowed_genders": [
+          "Male",
+          "Female",
+          "Other"
+        ],
+        "allowed_castes": [
+          "SC"
+        ],
         "min_education_level": 4,
         "allow_defaulters": false,
         "pwd_eligible": true,
@@ -254,8 +299,12 @@
       "eligibility_rules": {
         "min_age": 18,
         "max_age": 35,
-        "allowed_genders": ["Female"],
-        "allowed_castes": ["SC"],
+        "allowed_genders": [
+          "Female"
+        ],
+        "allowed_castes": [
+          "SC"
+        ],
         "min_education_level": 0,
         "allow_defaulters": false,
         "pwd_eligible": true,
@@ -294,8 +343,17 @@
       "eligibility_rules": {
         "min_age": 18,
         "max_age": 35,
-        "allowed_genders": ["Male", "Female", "Other"],
-        "allowed_castes": ["General", "SC", "ST", "OBC"],
+        "allowed_genders": [
+          "Male",
+          "Female",
+          "Other"
+        ],
+        "allowed_castes": [
+          "General",
+          "SC",
+          "ST",
+          "OBC"
+        ],
         "min_education_level": 4,
         "allow_defaulters": false,
         "pwd_eligible": true,
@@ -318,6 +376,56 @@
         "Step 3: Book an appointment and visit your local District Registration and Counseling Centre (DRCC) with original documents",
         "Step 4: DRCC team verifies documents and forwards application to the Bihar State Educational Finance Corporation",
         "Step 5: Sanction letter and Student Credit Card issued with loan disbursed directly to the academic institution"
+      ]
+    },
+    {
+      "scheme_id": "MOHUA-PMSVANIDHI",
+      "scheme_name": "PM Street Vendor's AtmaNirbhar Nidhi (PM SVANidhi)",
+      "issuing_authority": "Ministry of Housing and Urban Affairs",
+      "loan_category": "Working Capital Micro Loan",
+      "max_loan_amount": 50000,
+      "min_loan_amount": 10000,
+      "interest_rate": 7.0,
+      "interest_rate_range": "7% interest subsidy per annum credited directly on timely repayment",
+      "moratorium_months": 0,
+      "funding_pct": 100,
+      "purpose": "micro",
+      "eligibility_rules": {
+        "min_age": 18,
+        "max_age": 65,
+        "allowed_genders": [
+          "Male",
+          "Female",
+          "Other"
+        ],
+        "allowed_castes": [
+          "SC",
+          "ST",
+          "OBC",
+          "General"
+        ],
+        "min_education_level": 0,
+        "allow_defaulters": false,
+        "pwd_eligible": true,
+        "special_conditions": [
+          "Must be a street vendor vending in urban, peri-urban, or rural areas adjacent to urban areas",
+          "Must possess Certificate of Vending (CoV) or Identity Card issued by Urban Local Bodies (ULBs), or a Letter of Recommendation (LoR) from ULB/Town Vending Committee",
+          "Collateral-free loan provided in graduated tranches (₹10,000 first tranche, ₹20,000 second tranche, up to ₹50,000 third tranche)",
+          "Incentive for digital transactions via monthly cashback up to ₹100 (₹1,200 annually)"
+        ]
+      },
+      "contact_and_apply": {
+        "portal_url": "https://pmsvanidhi.mohua.gov.in",
+        "toll_free_helpline": "1800-11-1979",
+        "support_email": "pmsvanidhi-mohua@gov.in",
+        "designated_physical_office": "Urban Local Body (ULB) / Town Vending Committee / Nearest Lending Institution or CSC"
+      },
+      "application_steps": [
+        "Step 1: Verify mobile number linkage with Aadhaar card and ensure vending certification/identity card or Letter of Recommendation (LoR) is available.",
+        "Step 2: Visit the PM SVANidhi portal or approach a Common Service Centre (CSC) or municipal counter.",
+        "Step 3: Fill out the online application form with personal, business/vending, and bank details.",
+        "Step 4: Select preferred lending institution (Scheduled Commercial Bank, RRB, Small Finance Bank, Cooperative Bank, NBFC, or MFI).",
+        "Step 5: Submit application along with required documents for verification and electronic sanction/disbursement into savings bank account."
       ]
     }
   ]

@@ -1,4 +1,4 @@
-﻿"""
+"""
 fetch_schemes.py
 UDYAMSetu -- Live Scheme Data Pipeline (Fetch Stage)
 
@@ -18,6 +18,7 @@ CLI usage:
 import argparse
 import json
 import os
+import shutil
 import sys
 from datetime import datetime, timezone
 
@@ -38,6 +39,19 @@ except ImportError:
         _GENAI_NEW_SDK = False
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Auto-load .env file from BASE_DIR or current directory
+for _p in [os.path.join(BASE_DIR, ".env"), os.path.join(os.path.dirname(BASE_DIR), ".env"), ".env"]:
+    if os.path.exists(_p):
+        with open(_p, "r", encoding="utf-8-sig") as _f:
+            for _line in _f:
+                _line = _line.strip().lstrip("\ufeff")
+                if _line and not _line.startswith("#") and "=" in _line:
+                    _k, _v = _line.split("=", 1)
+                    _k = _k.strip()
+                    _v = _v.strip().strip('"').strip("'")
+                    if _k and _k not in os.environ:
+                        os.environ[_k] = _v
 
 # ---------------------------------------------------------------------------
 # File paths (all relative to the project root alongside app.py)
@@ -409,6 +423,62 @@ def fetch_query(query, existing_id_map, existing_name_map, pending_id_set):
     return accepted
 
 
+def direct_merge_to_schemes(candidates):
+    """
+    Directly merges validated candidates into schemes.json with backup and smoke test,
+    bypassing the need for manual human review.
+    """
+    if not candidates:
+        return
+
+    ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    backup_path = "{}.bak.{}".format(SCHEMES_FILE, ts)
+    if os.path.exists(SCHEMES_FILE):
+        shutil.copy2(SCHEMES_FILE, backup_path)
+        print("[BACKUP] Created backup of schemes.json at {}".format(backup_path))
+
+    if os.path.exists(SCHEMES_FILE):
+        with open(SCHEMES_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        schemes = data.get("schemes", [])
+    else:
+        schemes = []
+
+    existing_map = {s["scheme_id"]: idx for idx, s in enumerate(schemes)}
+    added = 0
+    updated = 0
+
+    for c in candidates:
+        clean = {k: v for k, v in c.items() if not k.startswith("_")}
+        sid = clean.get("scheme_id")
+        if sid in existing_map:
+            schemes[existing_map[sid]] = clean
+            updated += 1
+            print("  [AUTO-MERGE] Updated existing scheme: {} - {}".format(sid, clean.get("scheme_name")))
+        else:
+            schemes.append(clean)
+            existing_map[sid] = len(schemes) - 1
+            added += 1
+            print("  [AUTO-MERGE] Added new scheme directly to schemes.json: {} - {}".format(sid, clean.get("scheme_name")))
+
+    tmp_path = SCHEMES_FILE + ".tmp"
+    with open(tmp_path, "w", encoding="utf-8") as f:
+        json.dump({"schemes": schemes}, f, indent=2, ensure_ascii=False)
+
+    try:
+        from engine import load_schemes
+        loaded = load_schemes(tmp_path)
+        print("[SMOKE TEST] Engine successfully verified {} total schemes.".format(len(loaded)))
+        shutil.move(tmp_path, SCHEMES_FILE)
+        print("[SUCCESS] schemes.json directly updated with {} new & {} updated scheme(s)!".format(added, updated))
+    except Exception as exc:
+        print("[ERROR] Smoke test failed: {}. Rolling back.".format(exc))
+        if os.path.exists(backup_path):
+            shutil.copy2(backup_path, SCHEMES_FILE)
+        if os.path.exists(tmp_path):
+            os.unlink(tmp_path)
+
+
 # ---------------------------------------------------------------------------
 # Main entry point
 # ---------------------------------------------------------------------------
@@ -421,6 +491,11 @@ def main():
         type=str,
         default=None,
         help="Ad-hoc search query. If omitted, runs the default watchlist.",
+    )
+    parser.add_argument(
+        "--stage-only",
+        action="store_true",
+        help="If set, writes to pending_review.json instead of directly uploading to schemes.json.",
     )
     args = parser.parse_args()
 
@@ -439,7 +514,6 @@ def main():
 
     existing_pending = load_pending()
     pending_id_set = {p.get("scheme_id", "") for p in existing_pending}
-    print("[INFO] Loaded {} item(s) already in pending_review.json".format(len(existing_pending)))
 
     queries = [args.query] if args.query else DEFAULT_WATCHLIST
 
@@ -452,12 +526,17 @@ def main():
     print("[SUMMARY] {} new candidate(s) accepted this run".format(len(all_new_candidates)))
 
     if all_new_candidates:
-        merged_pending = existing_pending + all_new_candidates
-        save_pending(merged_pending)
-        print("[DONE] pending_review.json now contains {} item(s).".format(len(merged_pending)))
-        print("[NEXT] Run: python review.py  -- to approve/reject candidates.")
+        if args.stage_only:
+            merged_pending = existing_pending + all_new_candidates
+            save_pending(merged_pending)
+            print("[DONE] pending_review.json now contains {} item(s).".format(len(merged_pending)))
+            print("[NEXT] Run: python review.py  -- to approve/reject candidates.")
+        else:
+            # DIRECT MERGE INTO schemes.json
+            print("[ACTION] Directly uploading validated scheme(s) to schemes.json...")
+            direct_merge_to_schemes(all_new_candidates)
     else:
-        print("[DONE] No new candidates were accepted. pending_review.json unchanged.")
+        print("[DONE] No new candidates were accepted. schemes.json unchanged.")
 
 
 if __name__ == "__main__":

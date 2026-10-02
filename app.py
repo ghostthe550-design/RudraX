@@ -36,6 +36,19 @@ except ImportError:
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+# Auto-load .env file from BASE_DIR if present
+_env_path = os.path.join(BASE_DIR, ".env")
+if os.path.exists(_env_path):
+    with open(_env_path, "r", encoding="utf-8-sig") as _f:
+        for _line in _f:
+            _line = _line.strip().lstrip("\ufeff")
+            if _line and not _line.startswith("#") and "=" in _line:
+                _k, _v = _line.split("=", 1)
+                _k = _k.strip()
+                _v = _v.strip().strip('"').strip("'")
+                if _k and _k not in os.environ:
+                    os.environ[_k] = _v
+
 # Configure Flask with static directory and robust dual-path Jinja loader
 # so templates are found both in templates/ and in the workspace root.
 app = Flask(
@@ -52,7 +65,10 @@ app.jinja_loader = ChoiceLoader([
 # Load the scheme database once on startup using absolute file path.
 # ---------------------------------------------------------------
 SCHEMES_FILE = os.path.join(BASE_DIR, "schemes.json")
-SCHEMES = load_schemes(SCHEMES_FILE)
+def get_schemes():
+    return load_schemes(SCHEMES_FILE)
+
+SCHEMES = get_schemes()
 
 
 @app.route("/", methods=["GET"])
@@ -209,7 +225,7 @@ IMPORTANT: Return ONLY the JSON array. Do not wrap in markdown.
     # Fallback to local DB
     if not match_results:
         print("Falling back to local static DB.")
-        match_results = run_engine(user, SCHEMES)
+        match_results = run_engine(user, get_schemes())
 
     return render_template("results.html", user=user, results=match_results)
 
@@ -229,7 +245,7 @@ def compare():
 @app.route("/api/schemes", methods=["GET"])
 def api_schemes():
     """JSON API endpoint exposing active government loan schemes."""
-    return jsonify({"schemes": SCHEMES})
+    return jsonify({"schemes": get_schemes()})
 
 
 # ---------------------------------------------------------------------------
@@ -396,8 +412,9 @@ def api_ai_search():
             return jsonify({"results": [], "query_interpretation": "", "error": "Empty query."}), 400
 
         # Build a compact scheme catalogue for the prompt (scheme_id + name + key fields)
+        active_schemes = get_schemes()
         scheme_catalogue = []
-        for s in SCHEMES:
+        for s in active_schemes:
             rules = s.get("eligibility_rules", {})
             scheme_catalogue.append({
                 "scheme_id": s.get("scheme_id"),
@@ -452,7 +469,7 @@ IMPORTANT:
         api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
 
         if _GENAI_AVAILABLE and api_key:
-            model_name = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
+            model_name = os.environ.get("GEMINI_MODEL", "gemini-3.8-flash")
             try:
                 if _GENAI_NEW_SDK:
                     client = google_genai.Client(api_key=api_key)
@@ -492,7 +509,9 @@ IMPORTANT:
         # If AI returned nothing or failed, keyword fallback
         if not matched_ids:
             q_lower = query.lower()
-            for s in SCHEMES:
+            q_words = [w for w in q_lower.split() if len(w) > 3]
+            scored_matches = []
+            for s in active_schemes:
                 searchable = " ".join([
                     s.get("scheme_name", ""),
                     s.get("loan_category", ""),
@@ -500,16 +519,19 @@ IMPORTANT:
                     s.get("purpose", ""),
                     " ".join(s.get("eligibility_rules", {}).get("special_conditions", []))
                 ]).lower()
-                if any(word in searchable for word in q_lower.split() if len(word) > 3):
-                    matched_ids.append({
+                overlap = sum(1 for word in q_words if word in searchable)
+                if overlap > 0:
+                    scored_matches.append({
                         "scheme_id": s["scheme_id"],
-                        "match_score": 70,
+                        "match_score": min(95, 60 + overlap * 10),
+                        "overlap": overlap,
                         "reasons": ["Keyword match with your search query"]
                     })
-            matched_ids = matched_ids[:6]
+            scored_matches.sort(key=lambda x: x["overlap"], reverse=True)
+            matched_ids = scored_matches[:6]
 
         # Build full scheme objects for the matched IDs
-        scheme_map = {s["scheme_id"]: s for s in SCHEMES}
+        scheme_map = {s["scheme_id"]: s for s in active_schemes}
         results = []
         for match in matched_ids:
             sid = match.get("scheme_id")

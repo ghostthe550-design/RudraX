@@ -40,5 +40,9 @@ desktop.ini
 __pycache__/
 .pytest_cache/
 
+# Backups and temp files
+*.bak.*
+*.tmp
+
 # Node (if added later)
 node_modules/
