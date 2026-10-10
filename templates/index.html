@@ -3,10 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="UDYAMSetu — Find government concessional loan schemes you are eligible for. Deterministic rules engine with transparent eligibility scoring.">
   <title>UDYAMSetu — Government Scheme Matcher &amp; Eligibility Shield</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+
+<a href="#main-content" class="skip-link" data-i18n="nav.skip_to_main">Skip to main content</a>
 
 <header class="site-header">
   <div class="header-inner">
@@ -19,22 +22,41 @@
         </div>
       </div>
 
-      <div class="lang-switcher" id="lang-switcher">
-        <span class="lang-icon" aria-hidden="true">🌐</span>
-        <button type="button" class="lang-btn active" data-lang="en" onclick="setLanguage('en')">English</button>
-        <span class="lang-divider">|</span>
-        <button type="button" class="lang-btn" data-lang="hi" onclick="setLanguage('hi')">हिन्दी</button>
+      <div class="header-controls">
+        <button id="theme-toggle-btn" type="button"
+          aria-label="Switch to dark theme" title="Switch to dark theme"
+          data-i18n-aria-label="nav.theme_dark">
+          <span class="icon-moon" aria-hidden="true">🌙</span>
+          <span class="icon-sun" aria-hidden="true">☀️</span>
+        </button>
+
+        <div class="lang-switcher" id="lang-switcher">
+          <span class="lang-icon" aria-hidden="true">🌐</span>
+          <button type="button" class="lang-btn active" data-lang="en" onclick="setLanguage('en')">English</button>
+          <span class="lang-divider">|</span>
+          <button type="button" class="lang-btn" data-lang="hi" onclick="setLanguage('hi')">हिन्दी</button>
+        </div>
+
+        <button id="nav-toggle-btn" type="button"
+          aria-expanded="false" aria-controls="site-nav"
+          aria-label="Toggle navigation menu"
+          data-i18n-aria-label="nav.toggle_menu">
+          <span class="ham-bar"></span>
+          <span class="ham-bar"></span>
+          <span class="ham-bar"></span>
+        </button>
       </div>
     </div>
-    <nav class="site-nav">
-      <a href="{{ url_for('index') }}" class="nav-link active" data-i18n="nav.matcher">1. Scheme Matcher</a>
+    <nav class="site-nav" id="site-nav" aria-label="Main navigation">
+      <a href="{{ url_for('index') }}" class="nav-link active" data-i18n="nav.matcher" aria-current="page">1. Scheme Matcher</a>
       <a href="{{ url_for('compare') }}" class="nav-link" data-i18n="nav.compare">2. Compare Lenders</a>
       <a href="{{ url_for('navigator') }}" class="nav-link" data-i18n="nav.navigator">3. EMI Calculator &amp; Partner Map</a>
     </nav>
   </div>
 </header>
 
-<main>
+
+<main id="main-content">
 
   <div class="page-title-section">
     <h2 data-i18n="index.hero_title">Find Your Concessional Government Scheme</h2>
@@ -44,16 +66,17 @@
   <!-- ================================================================
        AI Scheme Search — Natural Language Quick Finder
   ================================================================ -->
-  <div class="ai-search-section" id="ai-search-section">
+  <section class="ai-search-section" id="ai-search-section"
+    aria-label="AI-powered scheme search">
     <div class="ai-search-header">
-      <span class="ai-search-badge">AI Search</span>
+      <span class="ai-search-badge" aria-hidden="true">AI Search</span>
       <div>
         <div class="ai-search-title">Search Schemes with AI</div>
-        <div class="ai-search-subtitle">Type what you need in plain English — our AI will find the best matching schemes instantly.</div>
+        <div class="ai-search-subtitle" id="ai-search-hint">Type what you need in plain English — our AI will find the best matching schemes instantly.</div>
       </div>
     </div>
 
-    <div class="ai-search-bar">
+    <div class="ai-search-bar" role="search">
       <div class="ai-search-input-wrap">
         <span class="ai-search-icon" aria-hidden="true">🔍</span>
         <input
@@ -63,14 +86,16 @@
           maxlength="300"
           autocomplete="off"
           aria-label="Search government schemes using AI"
+          aria-describedby="ai-search-hint"
+          data-i18n-placeholder="index.placeholder_ai_search"
         />
       </div>
       <button type="button" id="ai-search-btn" aria-label="Search with AI">
-        <span id="ai-search-btn-icon">✦</span> Search with AI
+        <span id="ai-search-btn-icon" aria-hidden="true">✦</span> Search with AI
       </button>
     </div>
 
-    <div class="ai-search-suggestions" id="ai-suggestion-pills">
+    <div class="ai-search-suggestions" id="ai-suggestion-pills" aria-label="Search suggestions">
       <button class="ai-suggestion-pill" type="button">Schemes for women entrepreneurs</button>
       <button class="ai-suggestion-pill" type="button">Agriculture loans for SC farmers</button>
       <button class="ai-suggestion-pill" type="button">Business loan for youth with low CIBIL</button>
@@ -80,8 +105,9 @@
     </div>
 
     <!-- Results injected here by JS -->
-    <div id="ai-search-results"></div>
-  </div>
+    <div id="ai-search-results" aria-live="polite" aria-atomic="false"></div>
+  </section>
+
 
   {% if request.args.get('error') == 'invalid_input' %}
     <div class="alert alert-danger" role="alert">

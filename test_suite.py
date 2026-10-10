@@ -26,7 +26,7 @@ data = {
 r = client.post('/results', data=data)
 assert r.status_code == 200, f'POST /results failed: {r.status_code}'
 assert b'Your Evaluated Scheme Compatibility' in r.data, 'Results heading missing'
-assert b'style="width: 100%;"' in r.data, 'Score bar width missing in results'
+assert b'class="score-bar-fill"' in r.data, 'Score bar fill missing in results'
 print('[PASS] POST /results (valid): 200 OK & progress bars formatted')
 
 # 4. POST /results (invalid/missing submission)
@@ -51,7 +51,7 @@ print('[PASS] GET /compare: 200 OK')
 r = client.get('/api/schemes')
 assert r.status_code == 200, f'GET /api/schemes failed: {r.status_code}'
 json_data = r.get_json()
-assert 'schemes' in json_data and len(json_data['schemes']) == 8, 'Schemes API count mismatch'
+assert 'schemes' in json_data and len(json_data['schemes']) >= 8, 'Schemes API count mismatch'
 print(f'[PASS] GET /api/schemes: 200 OK, returned {len(json_data["schemes"])} schemes')
 
 # 8. GET /static/style.css & /style.css

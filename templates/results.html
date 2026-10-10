@@ -3,10 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="UDYAMSetu — View your personalised government scheme eligibility results with transparent scoring and application roadmaps.">
   <title>UDYAMSetu — Your Scheme Match Results</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+
+<a href="#main-content" class="skip-link" data-i18n="nav.skip_to_main">Skip to main content</a>
 
 <header class="site-header">
   <div class="header-inner">
@@ -19,14 +22,32 @@
         </div>
       </div>
 
-      <div class="lang-switcher" id="lang-switcher">
-        <span class="lang-icon" aria-hidden="true">🌐</span>
-        <button type="button" class="lang-btn active" data-lang="en" onclick="setLanguage('en')">English</button>
-        <span class="lang-divider">|</span>
-        <button type="button" class="lang-btn" data-lang="hi" onclick="setLanguage('hi')">हिन्दी</button>
+      <div class="header-controls">
+        <button id="theme-toggle-btn" type="button"
+          aria-label="Switch to dark theme" title="Switch to dark theme"
+          data-i18n-aria-label="nav.theme_dark">
+          <span class="icon-moon" aria-hidden="true">🌙</span>
+          <span class="icon-sun" aria-hidden="true">☀️</span>
+        </button>
+
+        <div class="lang-switcher" id="lang-switcher">
+          <span class="lang-icon" aria-hidden="true">🌐</span>
+          <button type="button" class="lang-btn active" data-lang="en" onclick="setLanguage('en')">English</button>
+          <span class="lang-divider">|</span>
+          <button type="button" class="lang-btn" data-lang="hi" onclick="setLanguage('hi')">हिन्दी</button>
+        </div>
+
+        <button id="nav-toggle-btn" type="button"
+          aria-expanded="false" aria-controls="site-nav"
+          aria-label="Toggle navigation menu"
+          data-i18n-aria-label="nav.toggle_menu">
+          <span class="ham-bar"></span>
+          <span class="ham-bar"></span>
+          <span class="ham-bar"></span>
+        </button>
       </div>
     </div>
-    <nav class="site-nav">
+    <nav class="site-nav" id="site-nav" aria-label="Main navigation">
       <a href="{{ url_for('index') }}" class="nav-link" data-i18n="nav.matcher">1. Scheme Matcher</a>
       <a href="{{ url_for('compare') }}" class="nav-link" data-i18n="nav.compare">2. Compare Lenders</a>
       <a href="{{ url_for('navigator') }}" class="nav-link" data-i18n="nav.navigator">3. EMI Calculator &amp; Partner Map</a>
@@ -34,7 +55,7 @@
   </div>
 </header>
 
-<main>
+<main id="main-content">
 
   <div class="page-title-section">
     <h2 data-i18n="results.hero_title">Your Evaluated Scheme Compatibility</h2>
@@ -67,12 +88,25 @@
   </div>
   {% endif %}
 
+  {% if not results %}
+  <div class="empty-state" role="status">
+    <div class="empty-state-icon" aria-hidden="true">📋</div>
+    <div class="empty-state-title" data-i18n="results.empty_title">No Direct Scheme Matches Found</div>
+    <p class="empty-state-desc" data-i18n="results.empty_desc">Based on the profile criteria submitted, no central or state concessional schemes directly matched. Try adjusting your profile details or explore all available lender channels below.</p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
+      <a href="{{ url_for('index') }}" class="btn-primary" data-i18n="results.btn_adjust_profile">Adjust Profile Details</a>
+      <a href="{{ url_for('compare') }}" class="btn-outline" data-i18n="results.btn_compare_all">Compare All Lenders &amp; Schemes →</a>
+    </div>
+  </div>
+  {% endif %}
+
   {% for r in results %}
-  <section class="scheme-card status-{{ r.status | replace(' ', '-') | lower }}">
+  <section class="scheme-card status-{{ r.status | replace(' ', '-') | lower }}"
+    aria-labelledby="scheme-title-{{ loop.index }}">
 
     <div class="scheme-card-head">
       <div>
-        <h2>{{ r.scheme_name }}</h2>
+        <h2 id="scheme-title-{{ loop.index }}">{{ r.scheme_name }}</h2>
         <span class="scheme-authority">{{ r.issuing_authority }} &middot; <em>{{ r.loan_category }}</em></span>
       </div>
       <span class="status-badge">{{ r.status }}</span>

@@ -11,6 +11,11 @@ const I18N_DICTIONARY = {
     "nav.matcher": "1. Scheme Matcher",
     "nav.compare": "2. Compare Lenders",
     "nav.navigator": "3. EMI Calculator & Partner Map",
+    "nav.theme_toggle": "Toggle dark/light theme",
+    "nav.toggle_menu": "Toggle navigation menu",
+    "nav.theme_light": "Switch to light theme",
+    "nav.theme_dark": "Switch to dark theme",
+    "nav.skip_to_main": "Skip to main content",
 
     // Index / Form Page
     "index.hero_title": "Find Your Concessional Government Scheme",
@@ -87,6 +92,9 @@ const I18N_DICTIONARY = {
     "results.btn_locate": "Locate Nearby Disbursing Branch →",
     "results.btn_check_another": "Check Another Profile",
     "results.btn_compare_all": "Compare All Lenders & Schemes →",
+    "results.empty_title": "No Direct Scheme Matches Found",
+    "results.empty_desc": "Based on the profile criteria submitted, no central or state concessional schemes directly matched. Try adjusting your profile details or explore all available lender channels below.",
+    "results.btn_adjust_profile": "Adjust Profile Details",
 
     // Compare Page
     "compare.hero_title": "Multi-Channel Lender & Scheme Comparison",
@@ -117,6 +125,10 @@ const I18N_DICTIONARY = {
     "compare.simulate_emi": "Simulate EMI →",
     "compare.months": "Months",
     "compare.days": "Business Days",
+    "compare.empty_title": "No Lending Channels Match Filter",
+    "compare.empty_desc": "No lending options match the selected channel route. Try selecting 'All Lending Channels' or reset filters.",
+    "compare.btn_reset_filters": "Reset All Filters",
+    "compare.scroll_hint": "← Scroll horizontally to view complete loan comparison table →",
 
     // Navigator Page (EMI & Map)
     "navigator.hero_title": "Financial Navigator & Partner Locator",
@@ -166,6 +178,11 @@ const I18N_DICTIONARY = {
     "nav.matcher": "1. योजना पात्रता",
     "nav.compare": "2. ऋणदाता तुलना",
     "nav.navigator": "3. ईएमआई कैलकुलेटर व मैप",
+    "nav.theme_toggle": "थीम बदलें (डार्क/लाइट)",
+    "nav.toggle_menu": "नेविगेशन मेनू टॉगल करें",
+    "nav.theme_light": "लाइट थीम पर स्विच करें",
+    "nav.theme_dark": "डार्क थीम पर स्विच करें",
+    "nav.skip_to_main": "मुख्य सामग्री पर जाएं",
 
     // Index / Form Page
     "index.hero_title": "अपनी उपयुक्त सरकारी रियायती ऋण योजना खोजें",
@@ -242,6 +259,9 @@ const I18N_DICTIONARY = {
     "results.btn_locate": "निकटतम वितरण शाखा खोजें →",
     "results.btn_check_another": "अन्य प्रोफ़ाइल जांचें",
     "results.btn_compare_all": "सभी ऋणदाताओं और योजनाओं की तुलना करें →",
+    "results.empty_title": "कोई प्रत्यक्ष योजना मेल नहीं खाती",
+    "results.empty_desc": "प्रदान किए गए प्रोफ़ाइल मानदंडों के आधार पर, कोई रियायती योजना सीधे मेल नहीं खाती। अपनी प्रोफ़ाइल समायोजित करें या नीचे सभी ऋणदाता चैनल देखें।",
+    "results.btn_adjust_profile": "प्रोफ़ाइल विवरण समायोजित करें",
 
     // Compare Page
     "compare.hero_title": "मल्टी-चैनल ऋणदाता एवं योजना तुलना",
@@ -272,6 +292,10 @@ const I18N_DICTIONARY = {
     "compare.simulate_emi": "ईएमआई निकालें →",
     "compare.months": "महीने",
     "compare.days": "कार्य दिवस",
+    "compare.empty_title": "कोई ऋण चैनल मेल नहीं खाता",
+    "compare.empty_desc": "चयनित चैनल मार्ग से कोई ऋण विकल्प मेल नहीं खाता। 'सभी ऋण चैनल' चुनें या फ़िल्टर रीसेट करें।",
+    "compare.btn_reset_filters": "सभी फ़िल्टर रीसेट करें",
+    "compare.scroll_hint": "← पूरी तुलना तालिका देखने के लिए क्षैतिज स्क्रॉल करें →",
 
     // Navigator Page (EMI & Map)
     "navigator.hero_title": "वित्तीय नेविगेटर एवं पार्टनर लोकेटर",
@@ -351,6 +375,32 @@ function setLanguage(lang) {
     }
   });
 
+  // Translate aria-label with data-i18n-aria-label
+  document.querySelectorAll('[data-i18n-aria-label]').forEach(el => {
+    const key = el.getAttribute('data-i18n-aria-label');
+    if (I18N_DICTIONARY[lang][key]) {
+      el.setAttribute('aria-label', I18N_DICTIONARY[lang][key]);
+    }
+  });
+
+  // Translate title with data-i18n-title
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    const key = el.getAttribute('data-i18n-title');
+    if (I18N_DICTIONARY[lang][key]) {
+      el.setAttribute('title', I18N_DICTIONARY[lang][key]);
+    }
+  });
+
+  // Update theme toggle accessible label if present
+  const themeToggle = document.getElementById('theme-toggle-btn');
+  if (themeToggle) {
+    const curTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    const labelKey = curTheme === 'dark' ? 'nav.theme_light' : 'nav.theme_dark';
+    const lbl = I18N_DICTIONARY[lang][labelKey] || 'Toggle theme';
+    themeToggle.setAttribute('aria-label', lbl);
+    themeToggle.setAttribute('title', lbl);
+  }
+
   // Trigger page-specific re-renders if available
   if (typeof applyFilters === 'function') {
     applyFilters();
@@ -360,7 +410,96 @@ function setLanguage(lang) {
   }
 }
 
+/* ===============================================================
+   Theme Management (Dark / Light Mode)
+   =============================================================== */
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const toggleBtn = document.getElementById('theme-toggle-btn');
+  if (toggleBtn) {
+    toggleBtn.setAttribute('data-current-theme', theme);
+    const labelKey = theme === 'dark' ? 'nav.theme_light' : 'nav.theme_dark';
+    const dict = I18N_DICTIONARY[currentLang] || I18N_DICTIONARY['en'];
+    const lbl = dict[labelKey] || 'Toggle theme';
+    toggleBtn.setAttribute('aria-label', lbl);
+    toggleBtn.setAttribute('title', lbl);
+  }
+}
+
+function initTheme() {
+  const saved = localStorage.getItem('udyamsetu_theme');
+  const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const currentTheme = saved || (systemDark ? 'dark' : 'light');
+  applyTheme(currentTheme);
+
+  const toggleBtn = document.getElementById('theme-toggle-btn');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      const active = document.documentElement.getAttribute('data-theme') || 'light';
+      const next = active === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+      localStorage.setItem('udyamsetu_theme', next);
+    });
+  }
+
+  if (window.matchMedia) {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+      if (!localStorage.getItem('udyamsetu_theme')) {
+        applyTheme(e.matches ? 'dark' : 'light');
+      }
+    });
+  }
+}
+
+/* ===============================================================
+   Mobile Navigation Toggle
+   =============================================================== */
+function initMobileNav() {
+  const toggleBtn = document.getElementById('nav-toggle-btn');
+  const siteNav = document.getElementById('site-nav');
+  if (!toggleBtn || !siteNav) return;
+
+  function closeMenu() {
+    toggleBtn.setAttribute('aria-expanded', 'false');
+    siteNav.classList.remove('nav-open');
+  }
+
+  toggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+    toggleBtn.setAttribute('aria-expanded', String(!isExpanded));
+    siteNav.classList.toggle('nav-open', !isExpanded);
+  });
+
+  // Close when pressing Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && siteNav.classList.contains('nav-open')) {
+      closeMenu();
+      toggleBtn.focus();
+    }
+  });
+
+  // Close when clicking outside of nav and toggle button
+  document.addEventListener('click', (e) => {
+    if (siteNav.classList.contains('nav-open') && !siteNav.contains(e.target) && !toggleBtn.contains(e.target)) {
+      closeMenu();
+    }
+  });
+
+  // Close when a nav-link is clicked on mobile
+  siteNav.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', () => {
+      if (window.innerWidth <= 768) {
+        closeMenu();
+      }
+    });
+  });
+}
+
 // Auto-run on DOM ready
 window.addEventListener('DOMContentLoaded', () => {
+  initTheme();
+  initMobileNav();
   setLanguage(currentLang);
 });
+
