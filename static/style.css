@@ -4,101 +4,97 @@
    Built for high-contrast accessibility, mobile responsiveness, & clean usability.
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Serif+4:wght@600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Source+Serif+4:wght@600;700;800&display=swap');
 
 :root {
-  /* Brand Palette */
-  --iron-900: #111622;
-  --iron-800: #1A202C;
-  --iron-700: #2D3748;
-  --iron-600: #4A5568;
-  --iron-500: #718096;
-  --iron-400: #A0AEC0;
-  --iron-300: #CBD5E0;
-  --iron-200: #E2E8F0;
-  --iron-100: #EDF2F7;
-  --iron-50:  #F7FAFC;
+  /* Brand Palette — Minimalist Indigo Scale */
+  --iron-900: #0F1026; /* Deep Midnight Indigo */
+  --iron-800: #1E1B4B; /* Deep Royal Indigo */
+  --iron-700: #312E81; /* Rich Indigo */
+  --iron-600: #4338CA; /* Vibrant Indigo */
+  --iron-500: #6366F1; /* Bright Indigo Accent */
+  --iron-400: #818CF8; /* Soft Indigo */
+  --iron-300: #C7D2FE; /* Periwinkle Light */
+  --iron-200: #E0E7FF; /* Light Indigo Border */
+  --iron-100: #F0F3FF; /* Soft Indigo Tint */
+  --iron-50:  #F5F7FF; /* Ultra Light Tint */
 
-  /* Accent Colors — ember-600 bumped to #B94A17 for WCAG AA 4.5:1 on white */
-  --ember-600: #B94A17;
-  --ember-500: #DD6B20;
-  --ember-400: #ED8936;
-  --ember-100: #FEEBC8;
+  /* Accent Colors — Rose Gold / Electric Coral */
+  --ember-600: #E11D48; /* Vibrant Rose Red */
+  --ember-500: #F43F5E; /* Electric Rose Gold / Coral */
+  --ember-400: #FB7185; /* Soft Rose Gold */
+  --ember-100: #FFE4E6; /* Light Rose Blush */
 
-  --gold-500: #D69E2E;
-  --gold-100: #FEFCBF;
+  --gold-500: #F59E0B; /* Amber Gold */
+  --gold-100: #FEF3C7; /* Soft Amber */
 
   /* State Indicators */
-  --success: #276749;
-  --success-bg: #F0FFF4;
-  --success-border: #9AE6B4;
+  --success: #059669;
+  --success-bg: #ECFDF5;
+  --success-border: #A7F3D0;
 
-  --warning: #B94A17;
-  --warning-bg: #FFFAF0;
-  --warning-border: #FBD38D;
+  --warning: #D97706;
+  --warning-bg: #FFFBEB;
+  --warning-border: #FDE68A;
 
-  --danger: #9B2C2C;
-  --danger-bg: #FFF5F5;
-  --danger-border: #FEB2B2;
+  --danger: #DC2626;
+  --danger-bg: #FEF2F2;
+  --danger-border: #FECACA;
 
   --panel-bg: #FFFFFF;
-  --body-bg: #F4F6F8;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+  --body-bg: #F8FAFC;
+  --shadow-sm: 0 1px 3px rgba(30, 27, 75, 0.05), 0 1px 2px rgba(30, 27, 75, 0.03);
+  --shadow-md: 0 4px 12px rgba(30, 27, 75, 0.08), 0 2px 4px rgba(30, 27, 75, 0.04);
+  --shadow-lg: 0 12px 24px -4px rgba(30, 27, 75, 0.12), 0 6px 12px -2px rgba(30, 27, 75, 0.08);
 
-  --radius-sm: 6px;
-  --radius-md: 10px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
   --radius-lg: 16px;
 
   /* Focus ring */
-  --focus-ring: 0 0 0 3px rgba(237, 137, 54, 0.5);
+  --focus-ring: 0 0 0 3px rgba(244, 63, 94, 0.45);
 }
 
 /* ==========================================================================
    DARK THEME OVERRIDES
    ========================================================================== */
 [data-theme="dark"] {
-  /* Invert charcoal scale */
-  --iron-900: #F7FAFC;
-  --iron-800: #EDF2F7;
+  --iron-900: #F8FAFC;
+  --iron-800: #F1F5F9;
   --iron-700: #E2E8F0;
-  --iron-600: #CBD5E0;
-  --iron-500: #A0AEC0;
-  --iron-400: #718096;
-  --iron-300: #4A5568;
-  --iron-200: #2D3748;
-  --iron-100: #1E2A38;
-  --iron-50:  #192130;
+  --iron-600: #CBD5E1;
+  --iron-500: #94A3B8;
+  --iron-400: #64748B;
+  --iron-300: #475569;
+  --iron-200: #1E293B;
+  --iron-100: #171836;
+  --iron-50:  #11122B;
 
-  /* Accent — keep ember recognizable, slightly lighter for dark */
-  --ember-600: #F6893B;
-  --ember-500: #ED8936;
-  --ember-400: #F6AD55;
-  --ember-100: rgba(237,137,54,0.15);
+  --ember-600: #FB7185;
+  --ember-500: #F43F5E;
+  --ember-400: #FDA4AF;
+  --ember-100: rgba(244, 63, 94, 0.18);
 
-  --gold-500: #F6E05E;
-  --gold-100: rgba(214,158,46,0.15);
+  --gold-500: #FBBF24;
+  --gold-100: rgba(245, 158, 11, 0.18);
 
-  /* State Indicators — adjusted for dark */
-  --success: #68D391;
-  --success-bg: rgba(72,187,120,0.12);
-  --success-border: rgba(72,187,120,0.35);
+  --success: #34D399;
+  --success-bg: rgba(52, 211, 153, 0.14);
+  --success-border: rgba(52, 211, 153, 0.35);
 
-  --warning: #F6AD55;
-  --warning-bg: rgba(237,137,54,0.12);
-  --warning-border: rgba(237,137,54,0.35);
+  --warning: #FBBF24;
+  --warning-bg: rgba(251, 191, 36, 0.14);
+  --warning-border: rgba(251, 191, 36, 0.35);
 
-  --danger: #FC8181;
-  --danger-bg: rgba(245,101,101,0.12);
-  --danger-border: rgba(245,101,101,0.35);
+  --danger: #F87171;
+  --danger-bg: rgba(248, 113, 113, 0.14);
+  --danger-border: rgba(248, 113, 113, 0.35);
 
-  /* Surfaces */
-  --panel-bg: #1A2332;
-  --body-bg: #111622;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.25);
-  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4), 0 2px 4px -1px rgba(0,0,0,0.3);
-  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.45), 0 4px 6px -2px rgba(0,0,0,0.3);
+  --panel-bg: #161738;
+  --body-bg: #0A0B1A;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.4);
+  --shadow-lg: 0 12px 24px rgba(0,0,0,0.6), 0 6px 12px rgba(0,0,0,0.5);
 }
 
 * {
@@ -122,7 +118,7 @@ body {
    NAVIGATION & HEADER
    ========================================================================== */
 .site-header {
-  background: linear-gradient(135deg, var(--iron-900) 0%, var(--iron-800) 100%);
+  background: linear-gradient(135deg, #0F1026 0%, #1E1B4B 100%);
   color: #FFFFFF;
   border-bottom: 3px solid var(--ember-500);
   box-shadow: var(--shadow-md);
@@ -149,18 +145,18 @@ body {
 }
 
 .brand-shield {
-  background: var(--ember-500);
+  background: linear-gradient(135deg, var(--ember-500) 0%, var(--ember-600) 100%);
   color: #FFFFFF;
   font-weight: 800;
   font-size: 1.15rem;
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-sm);
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   letter-spacing: -0.5px;
-  box-shadow: 0 2px 8px rgba(221, 107, 32, 0.4);
+  box-shadow: 0 4px 14px rgba(244, 63, 94, 0.45);
 }
 
 .brand-text h1 {
@@ -444,23 +440,27 @@ input:focus, select:focus {
 }
 
 .btn-primary {
-  background: var(--ember-500);
+  background: linear-gradient(135deg, var(--ember-500) 0%, var(--ember-600) 100%);
   color: #FFFFFF;
-  box-shadow: 0 2px 6px rgba(221, 107, 32, 0.3);
+  box-shadow: 0 4px 14px rgba(244, 63, 94, 0.35);
 }
 
 .btn-primary:hover {
-  background: var(--ember-600);
-  box-shadow: 0 4px 10px rgba(221, 107, 32, 0.4);
+  background: linear-gradient(135deg, var(--ember-400) 0%, var(--ember-500) 100%);
+  box-shadow: 0 6px 20px rgba(244, 63, 94, 0.5);
+  transform: translateY(-1px);
 }
 
 .btn-secondary {
   background: var(--iron-800);
   color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(30, 27, 75, 0.2);
 }
 
 .btn-secondary:hover {
-  background: var(--iron-900);
+  background: var(--iron-700);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(30, 27, 75, 0.3);
 }
 
 .btn-outline {
@@ -470,8 +470,10 @@ input:focus, select:focus {
 }
 
 .btn-outline:hover {
-  border-color: var(--iron-500);
-  background: var(--iron-50);
+  border-color: var(--ember-500);
+  color: var(--ember-600);
+  background: var(--ember-100);
+  transform: translateY(-1px);
 }
 
 .btn-block {
@@ -1226,12 +1228,12 @@ input:focus, select:focus {
    ========================================================================== */
 
 .ai-search-section {
-  background: linear-gradient(135deg, var(--iron-800) 0%, #1e2d45 100%);
+  background: linear-gradient(135deg, #1E1B4B 0%, #312E81 100%);
   border-radius: var(--radius-lg);
   padding: 32px 28px;
   margin-bottom: 32px;
-  border: 1px solid rgba(237, 137, 54, 0.25);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.06);
+  border: 1px solid rgba(244, 63, 94, 0.3);
+  box-shadow: 0 12px 36px rgba(30, 27, 75, 0.25), inset 0 1px 0 rgba(255,255,255,0.08);
   position: relative;
   overflow: hidden;
 }
@@ -1243,7 +1245,7 @@ input:focus, select:focus {
   right: -60px;
   width: 200px;
   height: 200px;
-  background: radial-gradient(circle, rgba(237, 137, 54, 0.15) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(244, 63, 94, 0.2) 0%, transparent 70%);
   pointer-events: none;
 }
 
